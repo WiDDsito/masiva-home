@@ -163,4 +163,9 @@ Las primeras fotografías visibles se preparan antes de capturar el destino, con
 
 ## Fundido del CTA de Inicio (13 de noviembre de 2026)
 
-El botón «Ver catálogo completo» de Inicio reutiliza el fundido de «Explorar el catálogo», incluidas preparación de fotografías y alternativa sin la API nativa. El alcance visual de este ajuste se limita a ese CTA: los accesos del menú Tienda conservan su transición anterior. `check:showroom-transition` verifica ambos enlaces; `check:transitions` comprueba que el menú mantiene su variante previa.
+El botón «Ver catálogo completo» de Inicio reutiliza el fundido de «Explorar el catálogo», incluidas preparación de fotografías y alternativa sin la API nativa. «Ver todo el catálogo» del menú Tienda también utiliza este fundido. La navegación se coordina desde App para capturar la posición actual antes de restablecer el scroll de la vista de destino. Los accesos individuales a categorías conservan su variante anterior.
+
+
+## Menú: catálogo desde la posición actual (13 de noviembre de 2026)
+
+«Ver todo el catálogo» cierra el menú sin desplazar el foco y realiza el fundido desde el punto donde estaba el usuario. El scroll del catálogo se reinicia después de capturar el origen; no se recorre Inicio. La prueba `check:menu-position` comprueba el scroll en el instante del clic y al iniciar la transición desde Showroom, Servicios y Contacto, en móvil y escritorio. El historial de cambios se mantiene en Git/GitHub; no se crean nuevos respaldos locales.

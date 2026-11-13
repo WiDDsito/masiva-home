@@ -84,7 +84,7 @@ const mobileLinks = [
   { href: '#contacto', label: 'Contacto' },
 ]
 
-export function Header() {
+export function Header({ onCatalogNavigate }: { onCatalogNavigate: (id: string) => void }) {
   const [open, setOpen] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const navigating = useRef(false)
@@ -141,9 +141,9 @@ export function Header() {
       await Promise.allSettled(animations.map(animation => animation.finished))
     }
     flushSync(() => { setOpen(false); setLeaving(false) })
-    if (window.matchMedia('(max-width: 900px)').matches) mobileTrigger.current?.focus()
-    else megaTrigger.current?.focus()
-    window.location.hash = id === 'all' ? '#catalogo' : `#catalogo?categoria=${id}`
+    if (window.matchMedia('(max-width: 900px)').matches) mobileTrigger.current?.focus({ preventScroll: true })
+    else megaTrigger.current?.focus({ preventScroll: true })
+    onCatalogNavigate(id)
     navigating.current = false
   }
 

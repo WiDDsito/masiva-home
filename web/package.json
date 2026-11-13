@@ -28,7 +28,8 @@
     "check:transitions": "node scripts/transition-polish-check.mjs",
     "check:bag": "node scripts/bag-interactions-check.mjs",
     "check:showroom-hotspots": "node scripts/showroom-hotspots-check.mjs",
-    "check:showroom-transition": "node scripts/showroom-transition-check.mjs"
+    "check:showroom-transition": "node scripts/showroom-transition-check.mjs",
+    "check:menu-position": "node scripts/catalog-menu-position-check.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",

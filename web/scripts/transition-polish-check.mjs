@@ -44,7 +44,7 @@ try {
    const snapshots=await page.evaluate(()=>window.transitionMenus)
    assert.ok(snapshots.length>0)
    assert.ok(snapshots.every(menu=>menu.opacity==='0'&&menu.visibility==='hidden'),'La transición debe capturar la cabecera con el menú ya oculto')
-   assert.ok(snapshots.every(menu=>menu.variant==='page'),'El menú Tienda conserva su transición anterior')
+   assert.ok(snapshots.every(menu=>menu.variant==='showroom-catalog'),'Ver todo el catálogo usa el fundido desde la posición actual')
   }
   await page.reload({waitUntil:'domcontentloaded'})
   await page.getByRole('heading',{name:'Catálogo de muebles',exact:true}).waitFor()

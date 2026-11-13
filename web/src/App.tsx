@@ -68,7 +68,10 @@ export function App() {
         Saltar al contenido
       </a>
 
-      <Header />
+      <Header onCatalogNavigate={id => {
+        catalogTransition.current = id === 'all' ? 'showroom-catalog' : undefined
+        window.location.hash = id === 'all' ? '#catalogo' : `#catalogo?categoria=${id}`
+      }} />
 
       <main id="contenido" tabIndex={-1} className="page-view" onClickCapture={event => {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
