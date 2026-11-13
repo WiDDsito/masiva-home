@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es-PE">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23191817'/%3E%3Ctext x='5' y='29' fill='%23b18a50' font-size='28'%3EM%3C/text%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Masiva Home — Muebles que transforman tu hogar</title>
+    <meta
+      name="description"
+      content="Muebles funcionales fabricados en Lima. Diseño propio, precio directo y entrega con recojo en tienda o envío."
+    />
+    <meta name="theme-color" content="#F5F3EF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#191817" media="(prefers-color-scheme: dark)" />
+    <script>
+      // Marca que hay JavaScript: solo entonces se oculta el contenido a revelar.
+      document.documentElement.classList.add('js')
+
+      // Aplica la preferencia guardada antes de pintar, para evitar el destello.
+      try {
+        var savedTheme = localStorage.getItem('mh-theme')
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          document.documentElement.dataset.theme = savedTheme
+        }
+      } catch (error) {
+        /* almacenamiento bloqueado: se usa la preferencia del sistema */
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,385 @@
+/* ==========================================================================
+   Componentes compartidos
+   ========================================================================== */
+
+/* Botones ------------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: 0.8rem 1.6rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.btn--primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: color-mix(in srgb, currentColor 42%, transparent);
+  color: inherit;
+}
+
+.btn--ghost:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* Enlace de texto ---------------------------------------------------------- */
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  transition:
+    color var(--dur) var(--ease),
+    text-decoration-color var(--dur) var(--ease);
+}
+
+.link:hover {
+  color: var(--accent-strong);
+  text-decoration-color: var(--accent-strong);
+}
+
+/* Cota de medida ----------------------------------------------------------- */
+
+.cota {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: currentColor;
+}
+
+.cota__line {
+  position: relative;
+  width: clamp(2.5rem, 6vw, 5rem);
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.cota__line::before,
+.cota__line::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  width: 1px;
+  height: 11px;
+  background: currentColor;
+}
+
+.cota__line::before {
+  left: 0;
+}
+
+.cota__line::after {
+  right: 0;
+}
+
+.photo__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Marco de fotografía pendiente ------------------------------------------- */
+
+.photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--photo-tone, var(--surface-2));
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px rgba(25, 24, 23, 0.08);
+}
+
+.photo--ivory {
+  --photo-tone: #e9e3d9;
+}
+
+.photo--greige {
+  --photo-tone: var(--color-greige);
+}
+
+.photo--wood {
+  --photo-tone: #b99c7f;
+}
+
+.photo--dark {
+  --photo-tone: #262321;
+}
+
+/* En modo oscuro los marcos no son fotos: se atenúan para no deslumbrar.
+   Al llegar las fotografías reales, esta regla deja de tener efecto. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .photo--ivory {
+    --photo-tone: #cfc7ba;
+  }
+
+  :root:not([data-theme='light']) .photo--greige {
+    --photo-tone: #a89e8f;
+  }
+
+  :root:not([data-theme='light']) .photo--wood {
+    --photo-tone: #7c6449;
+  }
+}
+
+:root[data-theme='dark'] .photo--ivory {
+  --photo-tone: #cfc7ba;
+}
+
+:root[data-theme='dark'] .photo--greige {
+  --photo-tone: #a89e8f;
+}
+
+:root[data-theme='dark'] .photo--wood {
+  --photo-tone: #7c6449;
+}
+
+.photo__mark {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 9vw, 7rem);
+  letter-spacing: 0.12em;
+  color: rgba(25, 24, 23, 0.16);
+  user-select: none;
+}
+
+.photo--dark .photo__mark {
+  color: rgba(245, 243, 239, 0.2);
+}
+
+.photo__caption {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: rgba(25, 24, 23, 0.62);
+}
+
+.photo--dark .photo__caption {
+  color: rgba(245, 243, 239, 0.68);
+}
+
+.photo__caption strong {
+  display: block;
+  font-weight: 600;
+  color: rgba(25, 24, 23, 0.8);
+}
+
+.photo--dark .photo__caption strong {
+  color: rgba(245, 243, 239, 0.88);
+}
+
+/* Tarjeta de producto ------------------------------------------------------ */
+
+.product {
+  display: grid;
+  gap: var(--space-4);
+  cursor: pointer;
+}
+
+.product__media {
+  aspect-ratio: 4 / 5;
+  transition: transform 700ms var(--ease);
+}
+
+.product:hover .product__media {
+  transform: scale(1.03);
+}
+
+.product__name {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 500;
+  line-height: var(--leading-snug);
+}
+
+.product__model {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+.product__price {
+  margin-top: var(--space-2);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.product__availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-brass);
+  flex: none;
+}
+
+.dot--wood {
+  background: var(--color-walnut);
+}
+
+/* Tarjeta de categoría ----------------------------------------------------- */
+
+.category {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius);
+  isolation: isolate;
+}
+
+.category .photo {
+  height: 100%;
+  min-height: 100%;
+  transition: transform 800ms var(--ease);
+}
+
+.category__body {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  background: linear-gradient(
+    to top,
+    rgba(25, 24, 23, 0.78) 0%,
+    rgba(25, 24, 23, 0.42) 55%,
+    rgba(25, 24, 23, 0) 100%
+  );
+  color: var(--color-ivory);
+  text-shadow: 0 1px 2px rgba(25, 24, 23, 0.45);
+}
+
+.category:hover .photo,
+.category:focus-visible .photo {
+  transform: scale(1.04);
+}
+
+.category__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.2vw, 2.125rem);
+  font-weight: 500;
+  line-height: 1.1;
+  transition: transform var(--dur) var(--ease);
+}
+
+.category:hover .category__name,
+.category:focus-visible .category__name {
+  transform: translateY(-2px);
+}
+
+.category__count {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+/* Hotspot del showroom ----------------------------------------------------- */
+
+.hotspot {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(245, 243, 239, 0.7);
+  border-radius: 50%;
+  background: rgba(25, 24, 23, 0.38);
+  color: var(--color-ivory);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease);
+}
+
+.hotspot:hover,
+.hotspot:focus-visible {
+  background: rgba(25, 24, 23, 0.62);
+}
+
+.hotspot__label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.5rem);
+  translate: -50% 0;
+  padding: 0.35rem 0.6rem;
+  background: var(--color-ivory);
+  color: var(--color-charcoal);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.hotspot:hover .hotspot__label,
+.hotspot:focus-visible .hotspot__label {
+  opacity: 1;
+}
+
+/* Aviso de contenido de demostración -------------------------------------- */
+
+.footer__demo {
+  flex-basis: 100%;
+  color: var(--color-brass-light);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+}

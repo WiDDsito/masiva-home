@@ -1,0 +1,128 @@
+/* ==========================================================================
+   Tokens — MasivaHome
+   Definidos una sola vez. Ningún bloque debe escribir un color literal.
+   Referencia: SPEC 6.2 y 6.3 (decisión D-21).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Marca ---------------------------------------------------------------- */
+  --color-charcoal: #191817;
+  --color-ivory: #f5f3ef;
+  --color-greige: #d8d0c4;
+  --color-walnut: #8c6a49;
+  --color-brass: #b18a50;
+  --color-brass-dark: #765629;
+  --color-brass-light: #d0ae76;
+
+  /* Roles semánticos — modo claro ---------------------------------------- */
+  --bg: var(--color-ivory);
+  --surface: #ffffff;
+  --surface-2: var(--color-greige);
+  --text: var(--color-charcoal);
+  --text-muted: rgba(25, 24, 23, 0.72);
+  --border: var(--color-greige);
+  --accent: var(--color-brass);
+  --accent-hover: #a5814b;
+  --accent-text: var(--color-charcoal);
+  --accent-strong: var(--color-brass-dark);
+  --nav-hover: var(--color-brass-dark);
+  --focus: var(--color-charcoal);
+  --scrollbar-thumb: rgba(25, 24, 23, 0.16);
+
+  /* Secciones oscuras: carbón en ambos modos ----------------------------- */
+  --dark-bg: var(--color-charcoal);
+  --dark-surface: #232120;
+  --dark-text: var(--color-ivory);
+  --dark-muted: rgba(245, 243, 239, 0.72);
+  --dark-border: rgba(245, 243, 239, 0.18);
+  --dark-accent: var(--color-brass-light);
+
+  /* Tipografía ------------------------------------------------------------ */
+  --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-2xl: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  --text-3xl: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem);
+  --text-display: clamp(2.75rem, 1.7rem + 4.5vw, 5.25rem);
+
+  --leading-tight: 1.04;
+  --leading-snug: 1.2;
+  --leading-body: 1.65;
+
+  /* Espaciado ------------------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+
+  /* Estructura ------------------------------------------------------------ */
+  --container: 1320px;
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --section-y: clamp(4.5rem, 8vw, 8rem);
+  --radius: 2px;
+  --header-h: 4.5rem;
+
+  /* Movimiento ------------------------------------------------------------ */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 260ms;
+  --reveal-duration: 720ms;
+  --reveal-shift: 18px;
+}
+
+/* Modo oscuro.
+   Se aplica de dos formas: preferencia del sistema, o elección manual con
+   `data-theme="dark"` en <html>. Ambos bloques deben mantenerse iguales. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: var(--color-charcoal);
+    --surface: #232120;
+    --surface-2: #2a2725;
+    --text: var(--color-ivory);
+    --text-muted: rgba(245, 243, 239, 0.72);
+    --border: #3a3633;
+    --accent: var(--color-brass-light);
+    --accent-hover: var(--color-brass);
+    --accent-text: var(--color-charcoal);
+    --accent-strong: var(--color-brass-light);
+    --nav-hover: var(--color-brass-light);
+    --focus: var(--color-ivory);
+    --scrollbar-thumb: rgba(245, 243, 239, 0.16);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: var(--color-charcoal);
+  --surface: #232120;
+  --surface-2: #2a2725;
+  --text: var(--color-ivory);
+  --text-muted: rgba(245, 243, 239, 0.72);
+  --border: #3a3633;
+  --accent: var(--color-brass-light);
+  --accent-hover: var(--color-brass);
+  --accent-text: var(--color-charcoal);
+  --accent-strong: var(--color-brass-light);
+  --nav-hover: var(--color-brass-light);
+  --focus: var(--color-ivory);
+  --scrollbar-thumb: rgba(245, 243, 239, 0.16);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}

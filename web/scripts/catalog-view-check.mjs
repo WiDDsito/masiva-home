@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict'
+import { chromium } from 'playwright-core'
+const browser=await chromium.launch({channel:'chrome',headless:true})
+try {
+ for(const width of [390,1440]) {
+  const page=await browser.newPage({viewport:{width,height:900},reducedMotion:width===390?'reduce':'no-preference'})
+  const errors=[]; page.on('pageerror',e=>errors.push(e.message))
+  await page.goto(process.env.URL??'http://127.0.0.1:5177/',{waitUntil:'networkidle'})
+  await page.locator('#tienda .product').first().waitFor()
+  assert.equal(await page.locator('#tienda .product').count(),2)
+  assert.equal(await page.locator('.catalog-toolbar').count(),0)
+  assert.equal(await page.locator('#tienda .categories').count(),0)
+  await page.getByRole('button',{name:'Agregar Aparador Escanor al carrito'}).click()
+  await page.getByRole('link',{name:'Ver catálogo completo',exact:true}).click()
+  await page.getByRole('heading',{name:'Catálogo completo',exact:true}).waitFor()
+  assert.equal(await page.locator('.product').count(),7)
+  assert.equal(await page.locator('.hero').count(),0)
+  assert.ok(await page.getByRole('button',{name:'Carrito, 1 productos'}).isVisible())
+  await page.reload({waitUntil:'networkidle'})
+  assert.equal(await page.locator('.product').count(),7)
+  await page.getByRole('link',{name:'Volver al inicio',exact:true}).click()
+  await page.locator('#tienda .product').first().waitFor()
+  assert.equal(await page.locator('#tienda .product').count(),2)
+  await page.goBack({waitUntil:'networkidle'})
+  await page.getByRole('heading',{name:'Catálogo completo',exact:true}).waitFor()
+  await page.getByRole('link',{name:'Volver al inicio',exact:true}).click()
+  await page.getByRole('button',{name:'Buscar productos',exact:true}).click()
+  await page.locator('#catalog-search').waitFor()
+  await page.waitForFunction(()=>document.activeElement?.id==='catalog-search')
+  await page.locator('#catalog-search').fill('fabela')
+  assert.equal(await page.locator('.product').count(),1)
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth))
+  assert.deepEqual(errors,[])
+  console.log(`PASS ${width}px: dos destacados, catálogo separado, carrito compartido, recarga, historial y búsqueda`)
+  await page.close()
+ }
+} finally {await browser.close()}

@@ -1,0 +1,29 @@
+import { ACESFilmicToneMapping, PCFSoftShadowMap } from 'three'
+import type { RoomId } from '../content/showroom'
+import { useReducedMotion } from 'motion/react'
+import { Canvas } from '@react-three/fiber'
+import { ShowroomScene } from './ShowroomScene'
+
+export interface ShowroomProps {
+  room: RoomId
+  pan: boolean
+  active: string | null
+  onSelect: (name: string | null) => void
+  running: boolean
+  rotate: boolean
+  reset: number
+  zoom: number
+}
+
+export default function Showroom3D(props: ShowroomProps) {
+  const reduced = useReducedMotion()
+  return (
+    <Canvas camera={{ position: [5.2, 3.8, 6.8], fov: 38 }} dpr={[1, 1.5]}
+      frameloop={!props.running ? 'never' : props.rotate && !reduced ? 'always' : 'demand'}
+      onPointerMissed={event => { if (event.button === 0) props.onSelect(null) }}
+      onCreated={({gl})=>{gl.shadowMap.type=PCFSoftShadowMap;gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.1}}
+      gl={{ alpha: true, antialias: true }} shadows fallback={<p className="showroom__loading">Tu navegador no admite la vista 3D. Explora el catálogo de fotografías.</p>}>
+      <ShowroomScene {...props} />
+    </Canvas>
+  )
+}

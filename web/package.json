@@ -1,0 +1,47 @@
+{
+  "name": "masiva-home-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "shots": "node scripts/shots.mjs",
+    "check:theme": "node scripts/theme-check.mjs",
+    "check:motion": "node scripts/motion-check.mjs",
+    "check:layout": "node scripts/layout-check.mjs",
+    "check:cart": "node scripts/cart-check.mjs",
+    "check:showroom": "node scripts/showroom-check.mjs",
+    "check:experience": "node scripts/experience-check.mjs",
+    "check:catalog-view": "node scripts/catalog-view-check.mjs",
+    "check:products": "node scripts/product-interactions-check.mjs",
+    "check:services": "node scripts/services-bubble-check.mjs",
+    "check:new-motion": "node scripts/new-motion-check.mjs",
+    "check:render": "node scripts/render-check.mjs",
+    "check:showroom-realism": "node scripts/showroom-realism-check.mjs",
+    "check:showroom-commerce": "node scripts/showroom-commerce-check.mjs",
+    "check:catalog-navigation": "node scripts/catalog-navigation-check.mjs",
+    "check:catalog-visual": "node scripts/catalog-visual-check.mjs",
+    "check:header-menu": "node scripts/header-menu-check.mjs",
+    "check:header-experience": "node scripts/header-menu-experience-check.mjs"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "gsap": "^3.15.1",
+    "lenis": "^1.3.27",
+    "motion": "^14.12.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.160.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright-core": "^1.65.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
