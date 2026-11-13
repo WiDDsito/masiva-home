@@ -1,5 +1,5 @@
 import { transitionView } from './lib/viewTransition'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Catalog } from './blocks/Catalog'
 import { CartProvider } from './lib/CartContext'
 import { Cart } from './components/Cart'
@@ -27,6 +27,7 @@ function catalogParams(hash: string) {
 
 export function App() {
   const [hash, setHash] = useState(window.location.hash)
+  const catalogTransition = useRef<'showroom-catalog' | undefined>(undefined)
   const isCatalog = isCatalogHash(hash)
   const params = isCatalog ? catalogParams(hash) : { focusSearch: false, category: 'all' }
   useScrollAnimations(isCatalog)
@@ -35,9 +36,11 @@ export function App() {
     const onHashChange = () => {
       const next = window.location.hash
       const nextCatalog = isCatalogHash(next)
+      const variant = catalogTransition.current
+      catalogTransition.current = undefined
       if (nextCatalog !== isCatalog) transitionView(() => setHash(next), () => {
         if (nextCatalog) window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
-      })
+      }, variant)
       else setHash(next)
     }
     window.addEventListener('hashchange', onHashChange)
@@ -67,7 +70,11 @@ export function App() {
 
       <Header />
 
-      <main id="contenido" tabIndex={-1} className="page-view">
+      <main id="contenido" tabIndex={-1} className="page-view" onClickCapture={event => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+        const link = (event.target as Element).closest('a[href="#catalogo"]')
+        catalogTransition.current = link?.closest('#showroom') ? 'showroom-catalog' : undefined
+      }}>
         {isCatalog ? (
           <Catalog key={params.category} focusSearch={params.focusSearch} initialCategory={params.category} />
         ) : (

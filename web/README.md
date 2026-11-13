@@ -154,3 +154,9 @@ La prueba de comercio del showroom se actualizó a la estructura actual del cat�
 «Explorar el catálogo» conserva la transición de página y ahora restablece el scroll antes de capturar la vista de destino. El catálogo aparece desde su encabezado, también al venir desde una sección profunda. Cuando no existe View Transitions, hay una entrada breve de opacidad/desplazamiento; movimiento reducido sigue ofreciendo el cambio inmediato.
 
 Pruebas: `check:showroom-hotspots`, `check:showroom-commerce`, `check:showroom-transition` (nativa y alternativa) y `check:render`. Se verificó cero llamadas de dibujo WebGL en reposo y fuera de pantalla; esto no equivale a una certificación de FPS o Core Web Vitals.
+
+## Ajuste del fundido Showroom → Catálogo (13 de noviembre de 2026)
+
+El enlace «Explorar el catálogo» usa una transición específica de opacidad sobre la vista completa. Se evita que View Transitions anime el rectángulo de todo el contenido (en la prueba anterior se desplazaba desde y=-2009 px y cambiaba su altura de unos 5800 a 1900 px), y se retiran el zoom y la máscara de esta navegación. La salida dura 220 ms y la entrada 420 ms, con un solapamiento breve y sin mover el encuadre. La cabecera conserva su capa estable.
+
+Las primeras fotografías visibles se preparan antes de capturar el destino, con espera máxima de 180 ms para no bloquear la navegación en una conexión lenta. Sin la API nativa se aplica salida/entrada por opacidad; con movimiento reducido el cambio sigue siendo inmediato. Las demás rutas mantienen sus transiciones existentes. La prueba `check:showroom-transition` inspecciona los fotogramas para comprobar que no hay transformación del contenido largo y que el destino está al inicio del catálogo.
