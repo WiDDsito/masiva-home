@@ -22,6 +22,7 @@ npm run preview
 - [`web/`](web/): código React + TypeScript + Vite, fotografías y videos locales, pruebas y documentación de implementación.
 - [`docs/Informe-Masiva-Home-2026-11-13.md`](docs/Informe-Masiva-Home-2026-11-13.md): informe para alinear diseño, WordPress/backend y lenguaje del equipo.
 - [`web/README.md`](web/README.md): funciones implementadas, fuentes de datos, comprobaciones y límites actuales.
+- [`docs/Revision-skills-2026-11-13.md`](docs/Revision-skills-2026-11-13.md): revisión de usabilidad, rendimiento, catálogo y bolsa con mediciones locales.
 - `docs/` y `plan/`: especificaciones y decisiones históricas. Sus supuestos deben contrastarse con las instrucciones vigentes y el informe de alineamiento.
 
 ## Estado de integración
@@ -30,6 +31,6 @@ Esta entrega es un prototipo funcional local. Todavía no está integrado en Wor
 
 Los precios públicos de esta entrega provienen de **Carga General**. **Cotizaciones** se utiliza como información y no alimenta los precios públicos. Esta regla sustituye las referencias antiguas que indiquen lo contrario en `docs/` o `plan/`. Los productos sin precio confirmado permiten consulta desde el catálogo.
 
-El video actual de portada es `web/assets/videos/modern-template.mp4`, con audio silenciado. El archivo original pesa aproximadamente 17 MB; su optimización para publicación sigue pendiente.
+El video actual de portada es `web/assets/videos/modern-template.mp4`, con audio silenciado. El archivo actual pesa 1,4 MB. Con movimiento reducido se muestra el póster y no se solicita el video.
 
 No se versionan dependencias instaladas, compilaciones, capturas de prueba, respaldos ni archivos de configuración privados.

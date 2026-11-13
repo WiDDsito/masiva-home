@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { DemoProduct } from '../content/demo'
 import { contact } from '../content/demo'
 import { catalogFinishes } from '../content/catalogMedia'
-import { useCart } from '../lib/CartContext'
+import { useCartActions } from '../lib/CartContext'
 import { formatPEN } from '../lib/format'
 import { Button } from './Button'
 
@@ -11,7 +11,7 @@ export function CatalogPreview({ product, onClose, closeLabel = 'Cerrar vista r√
   const closing = useRef(false)
   const [finish, setFinish] = useState(0)
   const [photo, setPhoto] = useState(0)
-  const { add } = useCart()
+  const { add } = useCartActions()
   const finishes = catalogFinishes(product)
   const selection = finishes[finish]
   const image = selection.photos[photo]

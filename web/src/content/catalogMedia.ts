@@ -26,9 +26,12 @@ function photoLabel(path: string) {
   return 'Vista del producto'
 }
 
+const finishesCache = new WeakMap<DemoProduct, CatalogFinish[]>()
 export function catalogFinishes(product: DemoProduct): CatalogFinish[] {
+  const cached = finishesCache.get(product)
+  if (cached) return cached
   const folders = variants[product.id] ?? [{ folder: '', name: product.color, cover: '' }]
-  return folders.map(variant => {
+  const finishes = folders.map(variant => {
     const prefix = `../../assets/images/aparadores/${product.id}/${variant.folder ? `${variant.folder}/` : ''}`
     const photos = Object.entries(files).filter(([path]) => path.startsWith(prefix)).map(([path, src]) => ({ src, label: photoLabel(path), path }))
     photos.sort((a, b) => {
@@ -37,6 +40,8 @@ export function catalogFinishes(product: DemoProduct): CatalogFinish[] {
     })
     return { name: variant.name, photos: photos.length ? photos : product.image ? [{ src: product.image, label: 'Vista del producto' }] : [] }
   })
+  finishesCache.set(product, finishes)
+  return finishes
 }
 
 export const catalogGroups = [

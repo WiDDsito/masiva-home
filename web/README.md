@@ -129,7 +129,7 @@ Validación: `npm run build`, `npm run check:catalog-navigation` (390/1440 px) y
 
 ## Video moderno y menú Tienda (13 de noviembre de 2026)
 
-La portada usa `assets/videos/modern-template.mp4`, conservando reproducción inline, silencio forzado, pausa manual, pausa fuera de pantalla y respeto de movimiento reducido. No se altera el archivo original; pesa unos 17 MB y aún admite una versión optimizada para publicación.
+La portada usa `assets/videos/modern-template.mp4`, conservando reproducción inline, silencio forzado, pausa manual, pausa fuera de pantalla y respeto de movimiento reducido. No se altera el archivo original; pesa 1,4 MB. Con movimiento reducido se mantiene el póster y no se descarga el MP4.
 
 Se corrigió el espacio entre el disparador Tienda y el panel: el área de navegación abarca toda la altura de la cabecera y el cierre por salida del cursor tolera 180 ms. El estado distingue apertura por hover de apertura fijada por clic/teclado. Clic tras hover mantiene el panel, Escape y clic fuera lo cierran y el foco no vuelve a abrirlo por CSS. Las categorías se agrupan en Sala y comedor, Dormitorio y Oficina y orden; la imagen responde al cursor o foco y permite navegar. En móvil, Tienda despliega las mismas categorías dentro del menú.
 
@@ -169,3 +169,12 @@ El botón «Ver catálogo completo» de Inicio reutiliza el fundido de «Explora
 ## Menú: catálogo desde la posición actual (13 de noviembre de 2026)
 
 «Ver todo el catálogo» cierra el menú sin desplazar el foco y realiza el fundido desde el punto donde estaba el usuario. El scroll del catálogo se reinicia después de capturar el origen; no se recorre Inicio. La prueba `check:menu-position` comprueba el scroll en el instante del clic y al iniciar la transición desde Showroom, Servicios y Contacto, en móvil y escritorio. El historial de cambios se mantiene en Git/GitHub; no se crean nuevos respaldos locales.
+
+
+## Revisión con skills: navegación, catálogo y bolsa
+
+La búsqueda de cabecera abre el catálogo mediante su transición y enfoca el campo. Categoría, consulta y orden quedan en la URL (`categoria`, `q`, `orden`), se recuperan al recargar o volver atrás y no crean una entrada del historial por cada tecla. Se conservan las categorías y fotografías existentes.
+
+El aviso de agregado pausa su vencimiento mientras recibe foco, cursor o la bolsa está abierta. El cierre de la bolsa devuelve el foco al botón de origen. Si un producto alcanza 99 unidades, el aviso informa del límite en vez de confirmar un agregado inexistente. Las acciones estables del carrito se separan de su estado, evitando actualizar las tarjetas y el showroom al desaparecer un aviso. La galería reutiliza sus metadatos.
+
+Comprobaciones adicionales: `check:audit-usability` (búsqueda, filtros persistentes, historial, teclado y aviso), `audit:performance` (descargas iniciales y tamaños) y `audit:feedback-render` (dibujos WebGL al vencer el aviso). Aceptan `URL`. Las mediciones y limitaciones están en `../docs/Revision-skills-2026-11-13.md`. No se incorporan dependencias ni se modifica la dirección visual.

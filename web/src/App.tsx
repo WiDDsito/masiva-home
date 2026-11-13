@@ -20,7 +20,7 @@ function catalogParams(hash: string) {
   const query = hash.slice('#catalogo'.length)
   const params = new URLSearchParams(query.startsWith('?') ? query.slice(1) : '')
   return {
-    focusSearch: query.includes('buscar'),
+    focusSearch: params.has('buscar'),
     category: params.get('categoria') ?? 'all',
   }
 }
@@ -68,7 +68,16 @@ export function App() {
         Saltar al contenido
       </a>
 
-      <Header onCatalogNavigate={id => {
+      <Header onSearchNavigate={() => {
+        const search = document.querySelector<HTMLInputElement>('#catalog-search')
+        if (search) {
+          search.focus({ preventScroll: true })
+          search.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+        } else {
+          catalogTransition.current = 'showroom-catalog'
+          window.location.hash = '#catalogo?buscar'
+        }
+      }} onCatalogNavigate={id => {
         catalogTransition.current = id === 'all' ? 'showroom-catalog' : undefined
         window.location.hash = id === 'all' ? '#catalogo' : `#catalogo?categoria=${id}`
       }} />

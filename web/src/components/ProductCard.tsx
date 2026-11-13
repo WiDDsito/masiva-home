@@ -4,7 +4,7 @@ import { flushSync } from 'react-dom'
 import { useState } from 'react'
 import { Button } from './Button'
 import { ProductDetails } from './ProductDetails'
-import { useCart } from '../lib/CartContext'
+import { useCartActions } from '../lib/CartContext'
 import type { CSSProperties } from 'react'
 import type { DemoProduct } from '../content/demo'
 import { formatPEN } from '../lib/format'
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function ProductCard({ product, delay = 0 }: Props) {
-  const { add } = useCart()
+  const { add } = useCartActions()
   const reduced = useReducedMotion()
   const x = useMotionValue(0)
   const y = useMotionValue(0)

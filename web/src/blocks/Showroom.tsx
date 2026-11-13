@@ -1,5 +1,5 @@
 import { Button } from '../components/Button'
-import { useCart } from '../lib/CartContext'
+import { useCartActions } from '../lib/CartContext'
 import { formatPEN } from '../lib/format'
 import { products } from '../content/demo'
 import { Magnetic } from '../components/Magnetic'
@@ -22,7 +22,7 @@ class ShowroomBoundary extends Component<{ children: ReactNode }, { failed: bool
 }
 
 export function Showroom() {
-  const { add } = useCart()
+  const { add } = useCartActions()
   const [active, setActive] = useState<string | null>(null)
   const [room, setRoom] = useState<RoomId>('sala')
   const [pan, setPan] = useState(false)

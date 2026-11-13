@@ -1,11 +1,11 @@
 import type { DemoProduct } from '../content/demo'
 import { catalogFinishes } from '../content/catalogMedia'
 import { formatPEN } from '../lib/format'
-import { useCart } from '../lib/CartContext'
+import { useCartActions } from '../lib/CartContext'
 import { Button } from './Button'
 
 export function CatalogCard({ product, onPreview }: { product: DemoProduct; onPreview: (product: DemoProduct, trigger: HTMLButtonElement) => void }) {
-  const { add } = useCart()
+  const { add } = useCartActions()
   const finishes = catalogFinishes(product)
   return <article className="catalog-card">
     <button className="catalog-card__photo" type="button" aria-label={`Vista rápida de ${product.name}`} aria-haspopup="dialog" onClick={event => onPreview(product, event.currentTarget)}>

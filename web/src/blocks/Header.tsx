@@ -84,7 +84,7 @@ const mobileLinks = [
   { href: '#contacto', label: 'Contacto' },
 ]
 
-export function Header({ onCatalogNavigate }: { onCatalogNavigate: (id: string) => void }) {
+export function Header({ onCatalogNavigate, onSearchNavigate }: { onCatalogNavigate: (id: string) => void; onSearchNavigate: () => void }) {
   const [open, setOpen] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const navigating = useRef(false)
@@ -129,7 +129,7 @@ export function Header({ onCatalogNavigate }: { onCatalogNavigate: (id: string) 
     return () => { document.removeEventListener('keydown', onKeyDown); document.removeEventListener('pointerdown', onPointerDown) }
   }, [megaOpen])
 
-  const goCatalog = async (id: string) => {
+  const navigateFromHeader = async (navigate: () => void, focusTarget: HTMLElement | null) => {
     if (navigating.current) return
     navigating.current = true
     suppressHover.current = true
@@ -141,11 +141,12 @@ export function Header({ onCatalogNavigate }: { onCatalogNavigate: (id: string) 
       await Promise.allSettled(animations.map(animation => animation.finished))
     }
     flushSync(() => { setOpen(false); setLeaving(false) })
-    if (window.matchMedia('(max-width: 900px)').matches) mobileTrigger.current?.focus({ preventScroll: true })
-    else megaTrigger.current?.focus({ preventScroll: true })
-    onCatalogNavigate(id)
+    focusTarget?.focus({ preventScroll: true })
+    navigate()
     navigating.current = false
   }
+
+  const goCatalog = (id: string) => navigateFromHeader(() => onCatalogNavigate(id), window.matchMedia('(max-width: 900px)').matches ? mobileTrigger.current : megaTrigger.current)
 
   return (
     <header className={`site-header ${scrolled ? 'is-scrolled' : ''} ${leaving ? 'is-navigating' : ''}`.trim()}>
@@ -205,9 +206,11 @@ export function Header({ onCatalogNavigate }: { onCatalogNavigate: (id: string) 
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
-          <button className="icon-btn" type="button" aria-label="Buscar productos">
-            <SearchIcon />
-          </button>
+          <a className="icon-btn" href="#catalogo?buscar" aria-label="Buscar productos" onClick={event => {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+            event.preventDefault()
+            void navigateFromHeader(onSearchNavigate, event.currentTarget)
+          }}><SearchIcon /></a>
           <button className="icon-btn" type="button" aria-label={`Carrito, ${count} productos`} aria-haspopup="dialog" aria-expanded={cartOpen} aria-controls="shopping-bag" onClick={() => { setMegaMode('closed'); setOpen(false); setCartOpen(true) }}>
             <BagIcon />
             <span className="cart-count" aria-hidden="true">

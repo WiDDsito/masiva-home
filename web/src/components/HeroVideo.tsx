@@ -29,7 +29,7 @@ export function HeroVideo() {
     return () => { observer.disconnect(); element.pause(); element.removeEventListener('volumechange', silence); element.removeEventListener('loadeddata', sync); document.removeEventListener('visibilitychange', sync) }
   }, [paused, reduced])
   return <>
-    <video ref={video} className="hero__media hero__video" src={videoSource} poster={images.escanor} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" tabIndex={-1} disablePictureInPicture disableRemotePlayback />
+    <video ref={video} className="hero__media hero__video" src={reduced ? undefined : videoSource} poster={images.escanor} autoPlay={!reduced} muted loop playsInline preload={reduced ? 'none' : 'metadata'} aria-hidden="true" tabIndex={-1} disablePictureInPicture disableRemotePlayback />
     {!reduced && <button type="button" className="hero__video-control" aria-label={paused ? 'Reproducir video de portada' : 'Pausar video de portada'} aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? 'Reproducir video' : 'Pausar video'}</button>}
   </>
 }

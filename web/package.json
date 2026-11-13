@@ -29,7 +29,10 @@
     "check:bag": "node scripts/bag-interactions-check.mjs",
     "check:showroom-hotspots": "node scripts/showroom-hotspots-check.mjs",
     "check:showroom-transition": "node scripts/showroom-transition-check.mjs",
-    "check:menu-position": "node scripts/catalog-menu-position-check.mjs"
+    "check:menu-position": "node scripts/catalog-menu-position-check.mjs",
+    "check:audit-usability": "node scripts/audit-usability-check.mjs",
+    "audit:performance": "node scripts/audit-performance.mjs",
+    "audit:feedback-render": "node scripts/audit-feedback-render.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
