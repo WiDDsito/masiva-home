@@ -48,3 +48,13 @@
 .showroom__caption.has-selection .showroom__price { margin: 0; font-size: 1.125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .showroom__purchase .btn { min-height: 44px; padding: .625rem 1rem; font-size: .8125rem; }
 .showroom__caption .showroom__availability { margin: 0; font-size: .6875rem; }
+
+/* The + markers belong to sellable catalogue furniture, not room decoration. */
+.showroom__caption, .showroom__hint { z-index: 4; }
+.showroom-hotspot { position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 4px; border: 1px solid rgb(255 255 255 / .75); border-radius: 50%; background: rgb(25 24 23 / .16); color: var(--color-charcoal); cursor: pointer; pointer-events: auto; touch-action: manipulation; }
+.showroom-hotspot:focus-visible { outline: 2px solid var(--color-charcoal); outline-offset: 3px; }
+.showroom-hotspot__symbol { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--color-ivory); box-shadow: 0 2px 12px rgb(0 0 0 / .18); font: 500 1.5rem/1 var(--font-sans); transition: background 180ms, transform 180ms; }
+.showroom-hotspot:hover .showroom-hotspot__symbol, .showroom-hotspot:focus-visible .showroom-hotspot__symbol, .showroom-hotspot[aria-pressed=true] .showroom-hotspot__symbol { background: var(--color-brass-light); transform: scale(1.06); }
+.showroom-hotspot__label { position: absolute; bottom: calc(100% + .5rem); left: 50%; transform: translate(-50%, 4px); width: max-content; max-width: 180px; padding: .5rem .75rem; background: var(--color-charcoal); color: var(--color-ivory); font: .75rem/1.4 var(--font-sans); border-radius: var(--radius); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 180ms, transform 180ms, visibility 180ms; }
+.showroom-hotspot:hover .showroom-hotspot__label, .showroom-hotspot:focus-visible .showroom-hotspot__label { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .showroom-hotspot__symbol, .showroom-hotspot__label { transition: none; } }

@@ -26,7 +26,9 @@
     "check:header-menu": "node scripts/header-menu-check.mjs",
     "check:header-experience": "node scripts/header-menu-experience-check.mjs",
     "check:transitions": "node scripts/transition-polish-check.mjs",
-    "check:bag": "node scripts/bag-interactions-check.mjs"
+    "check:bag": "node scripts/bag-interactions-check.mjs",
+    "check:showroom-hotspots": "node scripts/showroom-hotspots-check.mjs",
+    "check:showroom-transition": "node scripts/showroom-transition-check.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",

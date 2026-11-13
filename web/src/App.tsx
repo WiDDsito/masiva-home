@@ -35,7 +35,9 @@ export function App() {
     const onHashChange = () => {
       const next = window.location.hash
       const nextCatalog = isCatalogHash(next)
-      if (nextCatalog !== isCatalog) transitionView(() => setHash(next))
+      if (nextCatalog !== isCatalog) transitionView(() => setHash(next), () => {
+        if (nextCatalog) window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+      })
       else setHash(next)
     }
     window.addEventListener('hashchange', onHashChange)

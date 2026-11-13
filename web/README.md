@@ -144,3 +144,13 @@ Al elegir una categoría desde la cabecera, se espera la animación de cierre an
 La bolsa de cabecera usa la cantidad del carrito compartido y abre su diálogo sin cambiar la ruta. El aviso de agregado incorpora icono, mayor contraste y «Ver bolsa»; permanece seis segundos y reinicia su tiempo al agregar de nuevo el mismo producto. El carrito conserva cantidades entre inicio, catálogo y recarga local. Sigue pendiente la integración comercial con WooCommerce.
 
 Pruebas nuevas: `npm run check:transitions` (incluye inspección de la cabecera al iniciar View Transitions) y `npm run check:bag` (contador, aviso, apertura sin redirección, cantidades, persistencia y eliminación), en móvil y escritorio. Aceptan `URL`.
+
+## Showroom: indicadores y continuidad de compra (13 de noviembre de 2026)
+
+Los muebles comprables muestran un indicador «+» anclado a su posición 3D: Fabela y Kevin en Sala, Escanor en Comedor y Runa en Dormitorio. Se pueden activar con ratón, toque o teclado, muestran el nombre al pasar el cursor/enfocar y reflejan la selección con una marca de verificación. Siguen el zoom, la rotación y el cambio de ambiente; se ocultan detrás de la geometría. La decoración no lleva indicadores. Se mantienen los controles inferiores como alternativa accesible. No hay pulsaciones o animaciones continuas de los indicadores.
+
+La prueba de comercio del showroom se actualizó a la estructura actual del catálogo y amplió el recorrido: Fabela ×2 + Kevin ×1 desde showroom, Escanor ×1 desde catálogo, vuelta a Inicio y recarga en Catálogo. Se comprueba la misma bolsa con cuatro unidades en tres líneas y subtotal S/ 3,656.00, conservando selección, filtros y precios.
+
+«Explorar el catálogo» conserva la transición de página y ahora restablece el scroll antes de capturar la vista de destino. El catálogo aparece desde su encabezado, también al venir desde una sección profunda. Cuando no existe View Transitions, hay una entrada breve de opacidad/desplazamiento; movimiento reducido sigue ofreciendo el cambio inmediato.
+
+Pruebas: `check:showroom-hotspots`, `check:showroom-commerce`, `check:showroom-transition` (nativa y alternativa) y `check:render`. Se verificó cero llamadas de dibujo WebGL en reposo y fuera de pantalla; esto no equivale a una certificación de FPS o Core Web Vitals.

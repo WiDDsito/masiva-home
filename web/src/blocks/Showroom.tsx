@@ -61,7 +61,7 @@ export function Showroom() {
         {visible && <ShowroomBoundary><Suspense fallback={<span className="showroom__loading" role="status">Preparando el showroom…</span>}>
           <Showroom3D room={room} pan={pan} active={active} onSelect={selectPiece} running={inViewport && pageVisible} rotate={rotate} reset={reset} zoom={zoom} />
         </Suspense></ShowroomBoundary>}
-        <div className={`showroom__caption ${product ? 'has-selection' : ''}`} key={active ?? room} aria-live="polite">
+        <div id="showroom-product" className={`showroom__caption ${product ? 'has-selection' : ''}`} key={active ?? room} aria-live="polite">
           {product && <img className="showroom__reference" src={product.image} alt={`Fotografía de referencia de ${product.name}`} />}
           <h3>{product?.name ?? rooms[room].description}</h3>
           <p>{piece?.detail ?? 'Selecciona un mueble para acercarte. Vuelve a pulsarlo o elige Vista general para regresar.'}</p>
@@ -74,7 +74,7 @@ export function Showroom() {
             </div>
           </>}
         </div>
-        <p className="showroom__hint" id="showroom-help">Arrastra para girar · Desplaza con el botón derecho al activar Desplazar</p>
+        <p className="showroom__hint" id="showroom-help">Pulsa + para explorar un mueble · Arrastra para girar</p>
       </div>
       <div className="container showroom__rooms" role="tablist" aria-label="Ambientes del showroom">
         {(Object.keys(rooms) as RoomId[]).map((id, index, list) => <Magnetic key={id}><button type="button" role="tab" id={`room-tab-${id}`} aria-selected={room === id} tabIndex={room === id ? 0 : -1} aria-controls="room-viewport" onClick={() => selectRoom(id)} onKeyDown={event => {

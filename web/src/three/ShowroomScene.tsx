@@ -9,6 +9,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { rooms } from '../content/showroom'
 import type { RoomId } from '../content/showroom'
 import { RoomContents } from './RoomContents'
+import { ShowroomHotspots } from './ShowroomHotspots'
 import type { ShowroomProps } from './Showroom3D'
 
 function MorphingRoom({ room, active, onSelect, zoom }: Pick<ShowroomProps, 'room' | 'active' | 'onSelect' | 'zoom'>) {
@@ -40,7 +41,7 @@ function MorphingRoom({ room, active, onSelect, zoom }: Pick<ShowroomProps, 'roo
     }
     if (Math.abs(progress.current - 1) > .001 || leaving || Math.abs(scale.current - zoom) > .001) invalidate()
   })
-  return <group ref={group}><RoomContents room={displayed} active={active} onSelect={onSelect} /></group>
+  return <group ref={group}><RoomContents room={displayed} active={active} onSelect={onSelect} />{displayed === room && <ShowroomHotspots room={displayed} active={active} onSelect={onSelect} />}</group>
 }
 
 export function ShowroomScene({ room, active, onSelect, running, rotate, reset, zoom, pan }: ShowroomProps) {
