@@ -134,3 +134,13 @@ La portada usa `assets/videos/modern-template.mp4`, conservando reproducción in
 Se corrigió el espacio entre el disparador Tienda y el panel: el área de navegación abarca toda la altura de la cabecera y el cierre por salida del cursor tolera 180 ms. El estado distingue apertura por hover de apertura fijada por clic/teclado. Clic tras hover mantiene el panel, Escape y clic fuera lo cierran y el foco no vuelve a abrirlo por CSS. Las categorías se agrupan en Sala y comedor, Dormitorio y Oficina y orden; la imagen responde al cursor o foco y permite navegar. En móvil, Tienda despliega las mismas categorías dentro del menú.
 
 Pruebas: `npm run check:header-menu` reproduce el recorrido lento que fallaba en el menú original. `npm run check:header-experience` verifica móvil/escritorio, teclado, foco, cabecera compacta, cierre exterior, navegación por imagen, selección y reproducción silenciada del video. Ambos aceptan `URL`.
+
+## Transiciones y bolsa local (13 de noviembre de 2026)
+
+La ficha de los productos destacados reutiliza la galería de `CatalogPreview`, con fotos y medidas, entrada local y salida animada. Abrir/cerrar una ficha ya no inicia una transición de página completa. El cierre respeta movimiento reducido y devuelve el foco a la imagen de origen. El CTA «Ver catálogo completo» usa la misma variante primaria que «Ver tienda».
+
+Al elegir una categoría desde la cabecera, se espera la animación de cierre antes de cambiar la ruta: las capturas de View Transitions no incluyen un menú semitransparente. Se evita reabrir por un cursor estacionado durante el cambio y se conserva el acceso por clic/teclado. En móvil se anima la salida del menú antes de retirarlo.
+
+La bolsa de cabecera usa la cantidad del carrito compartido y abre su diálogo sin cambiar la ruta. El aviso de agregado incorpora icono, mayor contraste y «Ver bolsa»; permanece seis segundos y reinicia su tiempo al agregar de nuevo el mismo producto. El carrito conserva cantidades entre inicio, catálogo y recarga local. Sigue pendiente la integración comercial con WooCommerce.
+
+Pruebas nuevas: `npm run check:transitions` (incluye inspección de la cabecera al iniciar View Transitions) y `npm run check:bag` (contador, aviso, apertura sin redirección, cantidades, persistencia y eliminación), en móvil y escritorio. Aceptan `URL`.

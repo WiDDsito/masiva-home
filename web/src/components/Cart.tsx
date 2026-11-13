@@ -5,7 +5,7 @@ import { useCart } from '../lib/CartContext'
 import { formatPEN } from '../lib/format'
 
 export function Cart() {
-  const { lines, setQuantity, open, setOpen, notice } = useCart()
+  const { lines, setQuantity, open, setOpen, notice, count } = useCart()
   const dialog = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     const element = dialog.current
@@ -21,8 +21,10 @@ export function Cart() {
   const message = `Hola, quisiera confirmar disponibilidad y entrega de:\n${items.map(l => `${l.quantity} × ${l.product.name} (${l.product.model}, ${l.product.color}) — ${formatPEN(l.product.price * l.quantity)}`).join('\n')}\nSubtotal de productos: ${formatPEN(total)}. Envío por confirmar.`
   const whatsapp = `${contact.whatsapp.split('?')[0]}?text=${encodeURIComponent(message)}`
   return <>
-    <p className={`cart-notice ${notice ? 'is-visible' : ''}`} role="status">{notice}</p>
-    <dialog ref={dialog} className="cart-dialog" aria-labelledby="cart-title" onCancel={() => setOpen(false)} onClose={() => setOpen(false)} data-lenis-prevent>
+    <div className={`cart-notice ${notice && !open ? 'is-visible' : ''}`} role="status" aria-live="polite" aria-atomic="true">
+      {notice && <><span className="cart-notice__icon" aria-hidden="true">✓</span><div><strong>Agregado a tu bolsa</strong><p>{notice}</p><Button onClick={() => setOpen(true)}>Ver bolsa ({count})</Button></div></>}
+    </div>
+    <dialog ref={dialog} id="shopping-bag" className="cart-dialog" aria-labelledby="cart-title" onCancel={() => setOpen(false)} onClose={() => setOpen(false)} data-lenis-prevent>
       <div className="cart-dialog__head"><h2 id="cart-title">Tu carrito</h2><button className="icon-btn" type="button" autoFocus aria-label="Cerrar carrito" onClick={() => setOpen(false)}>×</button></div>
       {items.length ? <>
         <ul className="cart-lines">{items.map(({ id, quantity, product }) => <li key={id}>

@@ -698,3 +698,9 @@
     grid-column: auto;
   }
 }
+
+/* Close navigation before a page snapshot can include its panel. */
+.site-header.is-navigating .mega, .site-header.is-navigating .mobile-nav { pointer-events: none; }
+.site-header.is-navigating .mobile-nav { animation: menu-leave 160ms ease-in forwards; }
+@keyframes menu-leave { to { opacity: 0; transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .site-header.is-navigating .mobile-nav { animation: none; } }

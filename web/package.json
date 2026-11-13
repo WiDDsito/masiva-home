@@ -24,7 +24,9 @@
     "check:catalog-navigation": "node scripts/catalog-navigation-check.mjs",
     "check:catalog-visual": "node scripts/catalog-visual-check.mjs",
     "check:header-menu": "node scripts/header-menu-check.mjs",
-    "check:header-experience": "node scripts/header-menu-experience-check.mjs"
+    "check:header-experience": "node scripts/header-menu-experience-check.mjs",
+    "check:transitions": "node scripts/transition-polish-check.mjs",
+    "check:bag": "node scripts/bag-interactions-check.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",

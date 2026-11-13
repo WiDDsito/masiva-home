@@ -23,7 +23,7 @@ export function Shop() {
         </div>
 
         <div className="shop__catalog-link">
-          <Button variant="ghost" href="#catalogo">Ver catálogo completo</Button>
+          <Button href="#catalogo">Ver catálogo completo</Button>
         </div>
 
         <p className="shop__note">Precios en soles. Disponibilidad y entrega sujetas a confirmación.</p>

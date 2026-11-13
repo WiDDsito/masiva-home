@@ -19,16 +19,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try { return restoreCart(localStorage.getItem('mh-cart-v1'), products.map(p => p.id)) } catch { return [] }
   })
   const [open, setOpen] = useState(false)
-  const [notice, setNotice] = useState('')
+  const [notice, setNotice] = useState({ text: '' })
   useEffect(() => { try { localStorage.setItem('mh-cart-v1', JSON.stringify(lines)) } catch { /* El carrito continúa en memoria. */ } }, [lines])
-  useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(''), 3500); return () => clearTimeout(timer) }, [notice])
+  useEffect(() => { if (!notice.text) return; const timer = setTimeout(() => setNotice({ text: '' }), 6000); return () => clearTimeout(timer) }, [notice])
   const setQuantity = (id: string, quantity: number) => { if (products.some(p => p.id === id)) setLines(current => updateCart(current, id, quantity)) }
   const add = (id: string) => {
     const product = products.find(p => p.id === id)
     if (!product) return
     setLines(current => updateCart(current, id, (current.find(l => l.id === id)?.quantity ?? 0) + 1))
-    setNotice(`${product.name} agregado al carrito`)
+    setNotice({ text: `${product.name} agregado al carrito` })
   }
-  return <CartContext.Provider value={{ lines, setQuantity, add, open, setOpen, count: lines.reduce((n, l) => n + l.quantity, 0), notice }}>{children}</CartContext.Provider>
+  return <CartContext.Provider value={{ lines, setQuantity, add, open, setOpen, count: lines.reduce((n, l) => n + l.quantity, 0), notice: notice.text }}>{children}</CartContext.Provider>
 }
 export function useCart() { const value = useContext(CartContext); if (!value) throw new Error('Falta CartProvider'); return value }

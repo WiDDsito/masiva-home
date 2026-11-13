@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
+import { useCart } from '../lib/CartContext'
 import { MegaMenu } from '../components/MegaMenu'
 import { useScrolled } from '../lib/useScrolled'
 import { useTheme } from '../lib/useTheme'
@@ -84,6 +86,10 @@ const mobileLinks = [
 
 export function Header() {
   const [open, setOpen] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const navigating = useRef(false)
+  const suppressHover = useRef(false)
+  const { count, open: cartOpen, setOpen: setCartOpen } = useCart()
   const [megaMode, setMegaMode] = useState<'closed' | 'hover' | 'pinned'>('closed')
   const megaOpen = megaMode !== 'closed'
   const megaRoot = useRef<HTMLDivElement>(null)
@@ -123,17 +129,26 @@ export function Header() {
     return () => { document.removeEventListener('keydown', onKeyDown); document.removeEventListener('pointerdown', onPointerDown) }
   }, [megaOpen])
 
-  const goCatalog = (id: string) => {
+  const goCatalog = async (id: string) => {
+    if (navigating.current) return
+    navigating.current = true
+    suppressHover.current = true
     cancelClose()
-    setMegaMode('closed')
-    setOpen(false)
+    flushSync(() => { setLeaving(true); setMegaMode('closed') })
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const panels = document.querySelectorAll('#mega-tienda, #menu-movil')
+      const animations = Array.from(panels).flatMap(panel => panel.getAnimations())
+      await Promise.allSettled(animations.map(animation => animation.finished))
+    }
+    flushSync(() => { setOpen(false); setLeaving(false) })
     if (window.matchMedia('(max-width: 900px)').matches) mobileTrigger.current?.focus()
     else megaTrigger.current?.focus()
     window.location.hash = id === 'all' ? '#catalogo' : `#catalogo?categoria=${id}`
+    navigating.current = false
   }
 
   return (
-    <header className={`site-header ${scrolled ? 'is-scrolled' : ''}`.trim()}>
+    <header className={`site-header ${scrolled ? 'is-scrolled' : ''} ${leaving ? 'is-navigating' : ''}`.trim()}>
       <div className="container header__inner">
         <a className="brand" href="#inicio" aria-label="Masiva Home, ir al inicio">
           Masiva Home
@@ -147,8 +162,8 @@ export function Header() {
           <div
             className={`nav__item nav__item--mega ${megaOpen ? 'is-open' : ''}`.trim()}
             ref={megaRoot}
-            onPointerEnter={event => { if (event.pointerType === 'mouse') { cancelClose(); setMegaMode(current => current === 'closed' ? 'hover' : current) } }}
-            onPointerLeave={scheduleClose}
+            onPointerEnter={event => { if (event.pointerType === 'mouse' && !navigating.current && !suppressHover.current) { cancelClose(); setMegaMode(current => current === 'closed' ? 'hover' : current) } }}
+            onPointerLeave={() => { suppressHover.current = false; scheduleClose() }}
             onKeyDown={event => { if (event.key === 'Tab' && megaOpen) setMegaMode('pinned') }}
             onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) { cancelClose(); setMegaMode('closed') } }}
           >
@@ -158,10 +173,10 @@ export function Header() {
               className="nav__link nav__trigger"
               aria-expanded={megaOpen}
               aria-controls="mega-tienda"
-              onClick={() => { cancelClose(); setMegaMode(current => current === 'pinned' ? 'closed' : 'pinned') }}
+              onClick={() => { if (navigating.current) return; suppressHover.current = false; cancelClose(); setMegaMode(current => current === 'pinned' ? 'closed' : 'pinned') }}
               onKeyDown={event => {
                 if (event.key === 'ArrowDown') {
-                  event.preventDefault(); cancelClose(); setMegaMode('pinned')
+                  event.preventDefault(); suppressHover.current = false; cancelClose(); setMegaMode('pinned')
                   requestAnimationFrame(() => megaRoot.current?.querySelector<HTMLButtonElement>('.mega__all')?.focus())
                 }
               }}
@@ -193,12 +208,12 @@ export function Header() {
           <button className="icon-btn" type="button" aria-label="Buscar productos">
             <SearchIcon />
           </button>
-          <a className="icon-btn" href="#tienda" aria-label="Carrito, 0 productos">
+          <button className="icon-btn" type="button" aria-label={`Carrito, ${count} productos`} aria-haspopup="dialog" aria-expanded={cartOpen} aria-controls="shopping-bag" onClick={() => { setMegaMode('closed'); setOpen(false); setCartOpen(true) }}>
             <BagIcon />
             <span className="cart-count" aria-hidden="true">
-              0
+              {count}
             </span>
-          </a>
+          </button>
           <button
             ref={mobileTrigger}
             className="icon-btn menu-btn"

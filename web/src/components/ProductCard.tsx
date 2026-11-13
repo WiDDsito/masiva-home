@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useMotionValue, useSpring, motion, useReducedMotion } from 'motion/react'
-import { transitionView } from '../lib/viewTransition'
+import { flushSync } from 'react-dom'
 import { useState } from 'react'
 import { Button } from './Button'
 import { ProductDetails } from './ProductDetails'
@@ -46,7 +46,7 @@ export function ProductCard({ product, delay = 0 }: Props) {
       className="product"
       style={{ '--reveal-delay': `${delay}ms`, rotateX: reduced || detailsOpen ? 0 : rotateX, rotateY: reduced || detailsOpen ? 0 : rotateY, transformPerspective: 1000 } as CSSProperties}
     >
-      <button ref={imageButton} className="product__image-button" type="button" aria-label={`Ver detalles de ${product.name}`} aria-haspopup="dialog" onClick={() => { resetTilt(); transitionView(() => setDetailsOpen(true)) }}>
+      <button ref={imageButton} className="product__image-button" type="button" aria-label={`Ver detalles de ${product.name}`} aria-haspopup="dialog" onClick={() => { resetTilt(); setDetailsOpen(true) }}>
       <Photo
         subject={product.name}
         detail={product.model}
@@ -54,7 +54,6 @@ export function ProductCard({ product, delay = 0 }: Props) {
         src={product.image}
         minimal
         className="product__media"
-        transitionName={detailsOpen ? undefined : `product-${product.id}`}
       />
       </button>
       <div>
@@ -70,7 +69,7 @@ export function ProductCard({ product, delay = 0 }: Props) {
         </p>
       </div>
       <Button variant="ghost" ariaLabel={`Agregar ${product.name} al carrito`} onClick={() => add(product.id)}>Agregar al carrito</Button>
-      {detailsOpen && <ProductDetails product={product} onClose={async () => { await transitionView(() => setDetailsOpen(false)); imageButton.current?.focus({ preventScroll: true }) }} />}
+      {detailsOpen && <ProductDetails product={product} onClose={() => { flushSync(() => setDetailsOpen(false)); imageButton.current?.focus({ preventScroll: true }) }} />}
     </motion.article>
   )
 }
