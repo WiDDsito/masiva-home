@@ -10,7 +10,7 @@ try {
    const native=document.startViewTransition?.bind(document)
    if(native)document.startViewTransition=(...args)=>{
     const el=document.querySelector('#mega-tienda');const css=el&&getComputedStyle(el)
-    window.transitionMenus.push({opacity:css?.opacity,visibility:css?.visibility})
+    window.transitionMenus.push({opacity:css?.opacity,visibility:css?.visibility,variant:document.documentElement.dataset.pageTransition})
     return native(...args)
    }
   })
@@ -44,6 +44,7 @@ try {
    const snapshots=await page.evaluate(()=>window.transitionMenus)
    assert.ok(snapshots.length>0)
    assert.ok(snapshots.every(menu=>menu.opacity==='0'&&menu.visibility==='hidden'),'La transición debe capturar la cabecera con el menú ya oculto')
+   assert.ok(snapshots.every(menu=>menu.variant==='page'),'El menú Tienda conserva su transición anterior')
   }
   await page.reload({waitUntil:'domcontentloaded'})
   await page.getByRole('heading',{name:'Catálogo de muebles',exact:true}).waitFor()

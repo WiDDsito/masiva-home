@@ -160,3 +160,7 @@ Pruebas: `check:showroom-hotspots`, `check:showroom-commerce`, `check:showroom-t
 El enlace «Explorar el catálogo» usa una transición específica de opacidad sobre la vista completa. Se evita que View Transitions anime el rectángulo de todo el contenido (en la prueba anterior se desplazaba desde y=-2009 px y cambiaba su altura de unos 5800 a 1900 px), y se retiran el zoom y la máscara de esta navegación. La salida dura 220 ms y la entrada 420 ms, con un solapamiento breve y sin mover el encuadre. La cabecera conserva su capa estable.
 
 Las primeras fotografías visibles se preparan antes de capturar el destino, con espera máxima de 180 ms para no bloquear la navegación en una conexión lenta. Sin la API nativa se aplica salida/entrada por opacidad; con movimiento reducido el cambio sigue siendo inmediato. Las demás rutas mantienen sus transiciones existentes. La prueba `check:showroom-transition` inspecciona los fotogramas para comprobar que no hay transformación del contenido largo y que el destino está al inicio del catálogo.
+
+## Fundido del CTA de Inicio (13 de noviembre de 2026)
+
+El botón «Ver catálogo completo» de Inicio reutiliza el fundido de «Explorar el catálogo», incluidas preparación de fotografías y alternativa sin la API nativa. El alcance visual de este ajuste se limita a ese CTA: los accesos del menú Tienda conservan su transición anterior. `check:showroom-transition` verifica ambos enlaces; `check:transitions` comprueba que el menú mantiene su variante previa.
