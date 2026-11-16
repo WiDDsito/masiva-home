@@ -1,4 +1,32 @@
-/* GSAP owns initial states only after it loads successfully. */
+/* A first-visit entrance starts with the markup, independent of optional GSAP. */
+.hero__visual { position: absolute; inset: 0; overflow: hidden; }
+.hero { background: var(--color-charcoal); }
+@media (prefers-reduced-motion: no-preference) {
+ .hero--entering .hero__visual { animation: hero-media-enter 1300ms cubic-bezier(.77,0,.175,1) both; }
+ .hero--entering .hero__line-inner { animation: hero-copy-enter 850ms var(--ease) 160ms both; }
+ .hero--entering .hero__line:nth-child(2) .hero__line-inner { animation-delay: 280ms; }
+ .hero--entering .hero__lead, .hero--entering .hero__actions, .hero--entering .hero__cota, .hero--entering .hero__claims, .hero--entering .hero__video-control { animation: hero-copy-enter 650ms var(--ease) 380ms both; }
+ .hero--entering .hero__actions, .hero--entering .hero__video-control { animation-delay: 460ms; }
+ .hero--entering .hero__cota { animation-delay: 520ms; }
+ .hero--entering .hero__claims { animation-delay: 600ms; }
+}
+@keyframes hero-media-enter { from { opacity: .25; clip-path: inset(8% 4%); transform: scale(1.025); } to { opacity: 1; clip-path: inset(0); transform: none; } }
+@keyframes hero-copy-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* Move the links, never their container: the mega menu stays anchored to the header. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 901px) {
+ .site-header--entering .nav > .nav__link, .site-header--entering .nav > .nav__item > .nav__trigger { animation: menu-link-enter 420ms var(--ease) 120ms both; }
+ .site-header--entering .nav > .nav__item > .nav__trigger { animation-delay: 180ms; }
+ .site-header--entering .nav > .nav__link:nth-child(3) { animation-delay: 240ms; }
+ .site-header--entering .nav > .nav__link:nth-child(4) { animation-delay: 300ms; }
+ .site-header--entering .nav > .nav__link:nth-child(5) { animation-delay: 360ms; }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 900px) {
+ .site-header--entering .menu-btn { animation: menu-link-enter 420ms var(--ease) 120ms both; }
+}
+@keyframes menu-link-enter { from { opacity: .35; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] { opacity: 1 !important; transform: none !important; }
+  .header__inner, .nav__link::after, .bento__cell::before { transition: none; }
 }

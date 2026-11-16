@@ -383,3 +383,9 @@
   font-size: 0.6875rem;
   letter-spacing: 0.02em;
 }
+
+@media (prefers-reduced-motion: reduce) {
+ .btn { transition: background-color 120ms, border-color 120ms, color 120ms; }
+ .btn:hover, .btn:active, .product:hover .product__media, .category:hover .photo, .category:focus-visible .photo, .category:hover .category__name, .category:focus-visible .category__name { transform: none; }
+ .product__media, .category .photo, .category__name { transition: none; }
+}

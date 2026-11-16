@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-/** Motion owns its initial states only after loading; native content remains the fallback. */
+/** CSS owns the hero entrance; optional libraries add scroll motion after loading. */
 export function useScrollAnimations(catalogView = false) {
   useEffect(() => {
     let cancelled = false
@@ -19,9 +19,6 @@ export function useScrollAnimations(catalogView = false) {
           const raf = (time: number) => lenis.raf(time * 1000)
           gsap.ticker.add(raf)
           if (!catalogView) {
-            gsap.fromTo('.hero__media', { clipPath: 'inset(12% 5% 12% 5%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.3, ease: 'power3.inOut' })
-            gsap.fromTo('.hero .split-word__inner', { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, duration: .8, stagger: .065, delay: .25, ease: 'power3.out' })
-            gsap.from('.hero__lead, .hero__actions', { opacity: 0, y: 12, duration: .65, stagger: .12, delay: .6 })
             gsap.fromTo('.hero__media', { scale: 1, yPercent: 0 }, { scale: 1.12, yPercent: 9, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: .5 } })
             gsap.to('.hero__inner', { y: -65, opacity: .25, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: .5 } })
           }

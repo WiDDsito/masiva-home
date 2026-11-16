@@ -13,6 +13,7 @@ export interface ShowroomProps {
   rotate: boolean
   reset: number
   zoom: number
+  onUnavailable: () => void
 }
 
 export default function Showroom3D(props: ShowroomProps) {
@@ -21,8 +22,8 @@ export default function Showroom3D(props: ShowroomProps) {
     <Canvas camera={{ position: [5.2, 3.8, 6.8], fov: 38 }} dpr={[1, 1.5]}
       frameloop={!props.running ? 'never' : props.rotate && !reduced ? 'always' : 'demand'}
       onPointerMissed={event => { if (event.button === 0) props.onSelect(null) }}
-      onCreated={({gl})=>{gl.shadowMap.type=PCFSoftShadowMap;gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.1}}
-      gl={{ alpha: true, antialias: true }} shadows fallback={<p className="showroom__loading">Tu navegador no admite la vista 3D. Explora el catálogo de fotografías.</p>}>
+      onCreated={({gl})=>{gl.shadowMap.type=PCFSoftShadowMap;gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.1;gl.domElement.addEventListener('webglcontextlost', props.onUnavailable, { once: true })}}
+      gl={{ alpha: true, antialias: true }} shadows fallback={<p className="showroom__loading">Puedes explorar las fotografías y medidas en el catálogo.</p>}>
       <ShowroomScene {...props} />
     </Canvas>
   )

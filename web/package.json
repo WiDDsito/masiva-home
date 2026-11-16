@@ -32,7 +32,11 @@
     "check:menu-position": "node scripts/catalog-menu-position-check.mjs",
     "check:audit-usability": "node scripts/audit-usability-check.mjs",
     "audit:performance": "node scripts/audit-performance.mjs",
-    "audit:feedback-render": "node scripts/audit-feedback-render.mjs"
+    "audit:feedback-render": "node scripts/audit-feedback-render.mjs",
+    "check:priority-one": "node scripts/priority-one-check.mjs",
+    "check:priority-medium": "node scripts/priority-medium-check.mjs",
+    "check:cart-hero-motion": "node scripts/cart-hero-motion-check.mjs",
+    "check:header-entry": "node scripts/header-entry-check.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",

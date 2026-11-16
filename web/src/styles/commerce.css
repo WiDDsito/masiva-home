@@ -13,6 +13,12 @@
 .catalog-empty { padding-block: 3rem; display: grid; gap: 1rem; justify-items: start; }
 .cart-dialog { position: fixed; inset: 0 0 0 auto; margin: 0; padding: clamp(1.25rem, 4vw, 2.5rem); height: 100dvh; max-height: 100dvh; width: min(100%, 560px); max-width: 100%; border: 0; background: var(--bg); color: var(--text); overflow-y: auto; overscroll-behavior: contain; }
 .cart-dialog[open] { animation: cart-in 250ms var(--ease); }
+.cart-dialog[open]::backdrop { animation: cart-backdrop-in 200ms ease-out; }
+.cart-dialog[data-closing] { pointer-events: none; }
+.cart-dialog { --cart-close-duration: 320ms; }
+.cart-dialog[data-closing]::backdrop { animation: cart-backdrop-out var(--cart-close-duration) cubic-bezier(.4,0,.2,1) forwards; }
+@keyframes cart-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cart-backdrop-out { to { opacity: 0; } }
 .cart-dialog::backdrop { background: rgba(0,0,0,.5); }
 .cart-dialog__head { display: flex; justify-content: space-between; gap: 1rem; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
 .cart-lines li { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 1rem; padding-block: 1.5rem; border-bottom: 1px solid var(--border); }
@@ -33,7 +39,12 @@
 .cart-notice p { font-size: .8125rem; color: var(--text-muted); margin: .375rem 0 .75rem; }
 .cart-notice button { font: 600 .8125rem var(--font-sans); min-height: 44px; background: var(--accent); color: var(--accent-text); border: 0; padding: .625rem 1rem; cursor: pointer; }
 @media (max-width: 640px) { .cart-notice { right: calc(1rem + env(safe-area-inset-right, 0px)); bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); } }
-@media (prefers-reduced-motion: reduce) { .cart-notice { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+ .cart-notice { transform: none; transition: opacity 120ms, visibility 120ms; }
+ .cart-dialog[open] { animation: cart-backdrop-in 80ms ease-out; }
+ .cart-dialog { --cart-close-duration: 160ms; }
+ .cart-dialog[open]::backdrop { animation-duration: 80ms; }
+}
 @keyframes cart-in { from { transform: translateX(100%); opacity: 0; } to { transform: none; opacity: 1; } }
 #tienda, #showroom, #servicios, #contacto { scroll-margin-top: 4.5rem; }
 @media (max-width: 640px) {

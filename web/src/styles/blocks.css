@@ -180,6 +180,12 @@
   color: var(--color-ivory);
 }
 
+@media (max-width: 640px) {
+ .hero__scrim { background: linear-gradient(90deg, color-mix(in srgb, var(--color-charcoal) 72%, transparent), color-mix(in srgb, var(--color-charcoal) 65%, transparent) 96%, color-mix(in srgb, var(--color-charcoal) 35%, transparent)); }
+ .hero__video { object-position: 58% center; }
+ .hero .hero__lead, .hero .hero__cota, .hero .claim { color: var(--color-ivory); }
+}
+
 .hero__title {
   max-width: 15ch;
   text-wrap: balance;

@@ -1,9 +1,9 @@
 export interface CartLine { id: string; quantity: number }
 export function updateCart(lines: CartLine[], id: string, quantity: number): CartLine[] {
   if (!Number.isFinite(quantity)) return lines
-  const next = lines.filter(line => line.id !== id)
-  if (quantity >= 1) next.push({ id, quantity: Math.min(99, Math.floor(quantity)) })
-  return next
+  if (quantity < 1) return lines.filter(line => line.id !== id)
+  const next = { id, quantity: Math.min(99, Math.floor(quantity)) }
+  return lines.some(line => line.id === id) ? lines.map(line => line.id === id ? next : line) : [...lines, next]
 }
 export function restoreCart(raw: string | null, validIds: string[]): CartLine[] {
   try {

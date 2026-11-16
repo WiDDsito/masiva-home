@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { categories, IS_DEMO } from '../content/demo'
+import { categories, contact, IS_DEMO } from '../content/demo'
 import { images } from '../content/images'
 
 export function Footer() {
@@ -24,7 +24,7 @@ export function Footer() {
             <ul className="footer__list">
               {categories.map((category) => (
                 <li key={category.id}>
-                  <a href="#tienda">{category.name}</a>
+                  <a href={`#catalogo?categoria=${category.id}`}>{category.name}</a>
                 </li>
               ))}
             </ul>
@@ -67,13 +67,13 @@ export function Footer() {
                 <a href="#contacto">Contacto</a>
               </li>
               <li>
-                <a href="#servicios">Preguntas frecuentes</a>
+                <a href="#ayuda?tema=preguntas">Preguntas frecuentes</a>
               </li>
               <li>
-                <a href="#servicios">Entrega y recojo</a>
+                <a href="#ayuda?tema=entrega">Entrega y recojo</a>
               </li>
               <li>
-                <a href="#contacto">Garantía</a>
+                <a href="#ayuda?tema=garantia">Garantía</a>
               </li>
             </ul>
           </nav>
@@ -88,13 +88,13 @@ export function Footer() {
             </h2>
             <ul className="footer__list">
               <li>
-                <a href="#contacto">Privacidad</a>
+                <a href={`${contact.whatsapp.split('?')[0]}?text=${encodeURIComponent('Hola, quisiera consultar la política de privacidad de Masiva Home.')}`} target="_blank" rel="noopener noreferrer">Consultar privacidad</a>
               </li>
               <li>
-                <a href="#contacto">Términos y condiciones</a>
+                <a href={`${contact.whatsapp.split('?')[0]}?text=${encodeURIComponent('Hola, quisiera consultar los términos y condiciones de Masiva Home.')}`} target="_blank" rel="noopener noreferrer">Consultar términos y condiciones</a>
               </li>
               <li>
-                <a href="#contacto">Libro de reclamaciones (por publicar)</a>
+                <span>Libro de reclamaciones (por publicar)</span>
               </li>
             </ul>
           </nav>

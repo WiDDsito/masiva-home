@@ -7,6 +7,7 @@ const { updateCart, restoreCart, cartReducer } = await import(`data:text/javascr
 assert.deepEqual(updateCart([], 'escanor', 1), [{id:'escanor',quantity:1}])
 assert.deepEqual(updateCart([{id:'escanor',quantity:1}], 'escanor', 2), [{id:'escanor',quantity:2}])
 assert.deepEqual(updateCart([{id:'escanor',quantity:2}], 'escanor', 0), [])
+assert.deepEqual(updateCart([{id:'escanor',quantity:1},{id:'fabela',quantity:1}], 'escanor', 2), [{id:'escanor',quantity:2},{id:'fabela',quantity:1}], 'Cambiar cantidad debe conservar la posición')
 assert.equal(updateCart([], 'escanor', 200)[0].quantity,99)
 assert.deepEqual(restoreCart('{broken', ['escanor']), [])
 assert.deepEqual(restoreCart('{"id":1}', ['escanor']), [])

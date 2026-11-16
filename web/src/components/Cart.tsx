@@ -8,23 +8,48 @@ import { formatPEN } from '../lib/format'
 export function Cart() {
   const { lines, setQuantity, open, setOpen } = useCart()
   const dialog = useRef<HTMLDialogElement>(null)
+  const closing = useRef(false)
   useEffect(() => {
     const element = dialog.current
     if (!element) return
-    if (open && !element.open) element.showModal()
-    if (!open && element.open) element.close()
+    if (open && !element.open) { closing.current = false; delete element.dataset.closing; element.showModal() }
+    if (!open) {
+      if (element.open) element.close()
+      element.getAnimations().forEach(animation => animation.cancel())
+      delete element.dataset.closing
+      closing.current = false
+    }
     const overflow = document.documentElement.style.overflow
     if (open) document.documentElement.style.overflow = 'hidden'
     return () => { document.documentElement.style.overflow = overflow }
   }, [open])
+  const requestClose = async () => {
+    const element = dialog.current
+    if (!element?.open || closing.current) return
+    closing.current = true
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const style = getComputedStyle(element)
+    const from = { opacity: style.opacity, transform: style.transform }
+    // Production CSS may shorten 320ms to .32s; Web Animations expects milliseconds.
+    const cssDuration = style.getPropertyValue('--cart-close-duration').trim()
+    const duration = parseFloat(cssDuration) * (cssDuration.endsWith('ms') ? 1 : 1000)
+    element.getAnimations().forEach(animation => animation.cancel())
+    element.dataset.closing = 'true'
+    if (typeof element.animate === 'function') {
+      await element.animate([from, { opacity: reduced ? 0 : from.opacity, transform: reduced ? 'none' : 'translateX(100%)' }], {
+        duration: Number.isFinite(duration) ? duration : (reduced ? 160 : 320), easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards',
+      }).finished.catch(() => undefined)
+    }
+    if (element.dataset.closing === 'true') setOpen(false)
+  }
   const items = lines.flatMap(line => { const product = products.find(p => p.id === line.id); return product ? [{ ...line, product }] : [] })
   const total = items.reduce((n, l) => n + Math.round(l.product.price * 100) * l.quantity, 0) / 100
   const message = `Hola, quisiera confirmar disponibilidad y entrega de:\n${items.map(l => `${l.quantity} × ${l.product.name} (${l.product.model}, ${l.product.color}) — ${formatPEN(l.product.price * l.quantity)}`).join('\n')}\nSubtotal de productos: ${formatPEN(total)}. Envío por confirmar.`
   const whatsapp = `${contact.whatsapp.split('?')[0]}?text=${encodeURIComponent(message)}`
   return <>
     <CartNotice />
-    <dialog ref={dialog} id="shopping-bag" className="cart-dialog" aria-labelledby="cart-title" onCancel={() => setOpen(false)} onClose={() => setOpen(false)} data-lenis-prevent>
-      <div className="cart-dialog__head"><h2 id="cart-title">Tu carrito</h2><button className="icon-btn" type="button" autoFocus aria-label="Cerrar carrito" onClick={() => setOpen(false)}>×</button></div>
+    <dialog ref={dialog} id="shopping-bag" className="cart-dialog" aria-labelledby="cart-title" onCancel={event => { event.preventDefault(); void requestClose() }} onClose={() => setOpen(false)} data-lenis-prevent>
+      <div className="cart-dialog__head"><h2 id="cart-title">Tu carrito</h2><button className="icon-btn" type="button" autoFocus aria-label="Cerrar carrito" onClick={() => void requestClose()}>×</button></div>
       {items.length ? <>
         <ul className="cart-lines">{items.map(({ id, quantity, product }) => <li key={id}>
           <img src={product.image} alt="" width="80" height="90" />
@@ -33,7 +58,7 @@ export function Cart() {
           </div>
         </li>)}</ul>
         <div className="cart-summary"><p>Subtotal <strong>{formatPEN(total)}</strong></p><p>Entrega y disponibilidad por confirmar.</p><Button block href={whatsapp} external>Consultar mi selección por WhatsApp</Button><p>Vista local. El pago en línea se habilitará al conectar el checkout de la tienda.</p></div>
-      </> : <div className="cart-empty"><h3>Tu próximo mueble te espera.</h3><p>Explora el catálogo y guarda aquí tus favoritos para comprar.</p><Button onClick={() => setOpen(false)}>Seguir explorando</Button></div>}
+      </> : <div className="cart-empty"><h3>Tu próximo mueble te espera.</h3><p>Explora el catálogo y guarda aquí tus favoritos para comprar.</p><Button onClick={() => void requestClose()}>Seguir explorando</Button></div>}
     </dialog>
   </>
 }

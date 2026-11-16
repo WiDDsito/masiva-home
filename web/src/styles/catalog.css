@@ -117,6 +117,6 @@
  .catalog-preview__body { gap: 1rem; }
 }
 @media (max-width: 359px) { .catalog-grid { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { .catalog-preview[open], .catalog-menu { animation: none; } .catalog-card__photo img, .catalog-card__quick { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .catalog-preview[open], .catalog-menu { animation: none; } .catalog-card__photo img, .catalog-card__quick { transition: none; transform: none !important; } }
 
 @media (prefers-reduced-motion: reduce) { .catalog-preview[open]::backdrop, .catalog-preview[data-closing]::backdrop { animation: none; } }

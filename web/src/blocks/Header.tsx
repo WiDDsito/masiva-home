@@ -85,6 +85,7 @@ const mobileLinks = [
 ]
 
 export function Header({ onCatalogNavigate, onSearchNavigate }: { onCatalogNavigate: (id: string) => void; onSearchNavigate: () => void }) {
+  const [entering, setEntering] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [open, setOpen] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const navigating = useRef(false)
@@ -106,6 +107,14 @@ export function Header({ onCatalogNavigate, onSearchNavigate }: { onCatalogNavig
   useEffect(() => () => clearTimeout(closeTimer.current), [])
   const { theme, toggle } = useTheme()
   const scrolled = useScrolled()
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const stop = () => { if (preference.matches) setEntering(false) }
+    stop()
+    preference.addEventListener('change', stop)
+    return () => preference.removeEventListener('change', stop)
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -149,7 +158,11 @@ export function Header({ onCatalogNavigate, onSearchNavigate }: { onCatalogNavig
   const goCatalog = (id: string) => navigateFromHeader(() => onCatalogNavigate(id), window.matchMedia('(max-width: 900px)').matches ? mobileTrigger.current : megaTrigger.current)
 
   return (
-    <header className={`site-header ${scrolled ? 'is-scrolled' : ''} ${leaving ? 'is-navigating' : ''}`.trim()}>
+    <header className={`site-header ${entering ? 'site-header--entering' : ''} ${scrolled ? 'is-scrolled' : ''} ${leaving ? 'is-navigating' : ''}`.trim()}
+      onFocusCapture={() => setEntering(false)} onPointerDownCapture={() => setEntering(false)}
+      onAnimationEnd={event => {
+        if (event.animationName === 'menu-link-enter' && (event.target as HTMLElement).matches('.nav > .nav__link:last-child, .menu-btn')) setEntering(false)
+      }}>
       <div className="container header__inner">
         <a className="brand" href="#inicio" aria-label="Masiva Home, ir al inicio">
           Masiva Home

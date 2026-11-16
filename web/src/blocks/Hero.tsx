@@ -3,10 +3,21 @@ import { Button } from '../components/Button'
 import { Cota } from '../components/Cota'
 import { HeroVideo } from '../components/HeroVideo'
 import { claims, contact } from '../content/demo'
+import { useEffect, useState } from 'react'
+
+let heroVisited = false
 
 export function Hero() {
+  const [entering, setEntering] = useState(() => !heroVisited && !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  useEffect(() => {
+    heroVisited = true
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const stop = () => { if (preference.matches) setEntering(false) }
+    preference.addEventListener('change', stop)
+    return () => preference.removeEventListener('change', stop)
+  }, [])
   return (
-    <section className="hero" id="inicio" aria-labelledby="hero-title">
+    <section className={`hero ${entering ? 'hero--entering' : ''}`} id="inicio" aria-labelledby="hero-title" onAnimationEnd={event => { if (event.animationName === 'hero-media-enter') setEntering(false) }}>
       <HeroVideo />
       <div className="hero__scrim" aria-hidden="true" />
 
