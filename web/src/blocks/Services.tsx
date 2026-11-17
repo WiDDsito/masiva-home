@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { images } from '../content/images'
 import { SplitText } from '../components/SplitText'
 import type { CSSProperties, PointerEvent } from 'react'
-import { services } from '../content/demo'
+import { contact, services } from '../content/demo'
+import { Button } from '../components/Button'
 
 const storyImages = [images.escanor, images.fabela, images.kevin, images.yoshi]
 export function Services() {
@@ -19,7 +20,7 @@ export function Services() {
     grid.current?.querySelectorAll('[data-step]').forEach(item => observer.observe(item))
     return () => observer.disconnect()
   }, [])
-  const setBubbleOrigin = (event: PointerEvent<HTMLAnchorElement>) => {
+  const setBubbleOrigin = (event: PointerEvent<HTMLElement>) => {
     const box = event.currentTarget
     const rect = box.getBoundingClientRect()
     const x = event.clientX - rect.left
@@ -39,13 +40,17 @@ export function Services() {
         <div className="section__head" data-reveal>
           <h2 className="section__title" id="servicios-title"><SplitText text="Servicios" /></h2>
           <p className="section__lead">
-            Comprar en línea debe ser tan claro como preguntar en la tienda. Esto es lo que
-            puedes esperar en cada paso.
+            Encuentra apoyo para diseñar tu espacio, personalizar tus muebles y coordinar
+            su entrega e instalación.
           </p>
+          <div className="services__actions">
+            <Button href={`${contact.whatsapp.split('?')[0]}?text=${encodeURIComponent('Hola, quisiera cotizar un proyecto de diseño de interiores o muebles personalizados.')}`} external>Cotizar mi proyecto</Button>
+            <Button href="#catalogo" variant="ghost">Explorar catálogo</Button>
+          </div>
         </div>
 
         <div className="services-layout">
-        <aside className="services-story" aria-label="Acompañamos tu compra">
+        <aside className="services-story" aria-label="Servicios para tu espacio">
           <div className="services-story__media">{storyImages.map((src, index) => <img key={src} src={src} alt={index === step ? 'Mueble de la colección Masiva Home' : ''} aria-hidden={index !== step} loading="lazy" className={index === step ? 'is-active' : ''} />)}</div>
           <div className="services-story__progress" aria-hidden="true">{services.map((_, index) => <span key={index} className={index <= step ? 'is-active' : ''} />)}</div>
           <p className="services-story__title" aria-live="polite">{services[step].title}</p>
@@ -53,20 +58,17 @@ export function Services() {
         </aside>
         <div className="bento" ref={grid}>
           {services.map((service, index) => (
-            <a
+            <article
               className={`bento__cell ${service.accent ? 'bento__cell--accent' : ''}`.trim()}
               data-step={index}
               key={service.title}
-              href="#servicios"
-              aria-label={`${service.title}. Ver detalle`}
               onPointerEnter={setBubbleOrigin}
               data-reveal
               style={{ '--reveal-delay': `${index * 90}ms` } as CSSProperties}
             >
               <h3 className="bento__title">{service.title}</h3>
               <p className="bento__text">{service.text}</p>
-              <span className="bento__link link">Ver detalle</span>
-            </a>
+            </article>
           ))}
         </div>
         </div>

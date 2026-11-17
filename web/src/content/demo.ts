@@ -195,6 +195,32 @@ export const products: DemoProduct[] = [
     "color": "Acabado a elegir",
     "dimensions": "Medidas por confirmar",
     "source": "1. Aparadores"
+  },
+  {
+    "id": "capra",
+    "name": "Aparador Capra",
+    "model": "Por confirmar",
+    "price": 0,
+    "availability": "unconfirmed",
+    "category": "comedor",
+    "tone": "ivory",
+    "image": images.capra,
+    "color": "Acabado según fotografía",
+    "dimensions": "120 × 85 × 45 cm",
+    "source": "assets/images/aparadores/capra/capra-medidas.webp"
+  },
+  {
+    "id": "cedric",
+    "name": "Aparador Cedric",
+    "model": "Por confirmar",
+    "price": 0,
+    "availability": "unconfirmed",
+    "category": "comedor",
+    "tone": "greige",
+    "image": images.cedric,
+    "color": "Acabado según fotografía",
+    "dimensions": "180 × 80 × 40 cm",
+    "source": "assets/images/aparadores/cedric/cedric-medidas.webp"
   }
 ]
 
@@ -214,23 +240,23 @@ export const claims = [
 
 export const services = [
   {
-    title: 'Compra en línea',
-    text: 'Explora los modelos y guarda tu selección en el carrito. Confirma con nuestro equipo los acabados, la disponibilidad y la entrega.',
+    title: 'Diseño de interiores',
+    text: 'Encuentra una distribución de muebles que se adapte a tu espacio. Consulta opciones para combinar medidas, estilos y acabados.',
     accent: false,
   },
   {
-    title: 'Cotización por WhatsApp',
-    text: 'Si necesitas varias piezas o tienes dudas, enviamos tu selección y te respondemos con el detalle.',
+    title: 'Muebles personalizados',
+    text: 'Cuéntanos qué necesitas y comparte las medidas de tu espacio. Consulta las opciones de diseño y acabados para tu mueble.',
     accent: true,
   },
   {
-    title: 'Entrega, recojo y garantía',
-    text: 'Recoge en tienda sin costo o coordina el envío. La garantía y los plazos se informan antes de pagar.',
+    title: 'Delivery',
+    text: 'Coordina la entrega de tus muebles según el producto y tu ubicación. Consulta disponibilidad, costo y fecha con nuestro equipo.',
     accent: false,
   },
   {
     title: 'Instalación y montaje',
-    text: 'Montamos y dejamos listo el mueble en tu espacio, con las medidas verificadas antes de entregar.',
+    text: 'Coordina la instalación y el montaje de tus muebles. Consulta los detalles del servicio antes de confirmar tu compra.',
     accent: false,
   },
 ]

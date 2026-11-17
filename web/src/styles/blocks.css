@@ -339,7 +339,7 @@
   border-radius: var(--radius);
   color: inherit;
   text-decoration: none;
-  cursor: pointer;
+  cursor: default;
 }
 
 /* A circular fill grows from the pointer entry point; no animation loop. */
@@ -363,8 +363,7 @@
   z-index: 1;
 }
 
-.bento__cell:hover::before,
-.bento__cell:focus-visible::before {
+.bento__cell:hover::before {
   transform: translate(-50%, -50%) scale(1);
 }
 
@@ -398,22 +397,6 @@
 
 .bento__cell--accent .bento__text {
   color: var(--dark-muted);
-}
-
-.bento__link {
-  justify-self: start;
-}
-
-.bento__cell:hover .bento__link {
-  color: var(--accent-strong);
-}
-
-.bento__cell--accent .bento__link {
-  color: var(--dark-text);
-}
-
-.bento__cell--accent:hover .bento__link {
-  color: var(--dark-accent);
 }
 
 /* Contacto ----------------------------------------------------------------- */

@@ -24,12 +24,22 @@ try {
   await page.screenshot({path:`.screenshots/catalog-gallery-${width}.png`})
   assert.ok(await dialog.evaluate(el=>el.scrollWidth<=el.clientWidth))
   await page.keyboard.press('Escape')
-  for(const name of ['Aira','Arden','Arian','Ars','Bruyne','Escanor']) {
+  for(const name of ['Aira','Arden','Arian','Ars','Bruyne','Escanor','Capra','Cedric']) {
    await page.getByRole('button',{name:`Vista rápida de Aparador ${name}`}).click()
    const image=page.locator('.catalog-preview__image')
    await image.evaluate(img=>img.decode())
    assert.ok(await image.evaluate(img=>img.naturalWidth>0))
    assert.ok(await page.locator('.catalog-preview__thumbnails button').count()>=5)
+   if(name==='Capra'||name==='Cedric') {
+    assert.equal(await page.locator('.catalog-preview__thumbnails button').count(),6)
+    assert.match(await dialog.innerText(),/Precio por confirmar/)
+    assert.ok((await dialog.innerText()).includes(name==='Capra'?'120 × 85 × 45 cm':'180 × 80 × 40 cm'))
+    assert.equal(await dialog.getByRole('button',{name:/Agregar .* al carrito/}).count(),0)
+    await dialog.getByRole('button',{name:/Ver foto .*Medidas/}).click()
+    await image.evaluate(img=>img.decode())
+    assert.match(await image.getAttribute('src'),/medidas/)
+    assert.ok(await dialog.getByRole('link',{name:'Consultar precio',exact:true}).isVisible())
+   }
    await page.keyboard.press('Escape')
   }
   await page.getByRole('button',{name:'Limpiar filtros'}).click()
@@ -40,7 +50,7 @@ try {
   await page.evaluate(()=>document.documentElement.dataset.theme='dark')
   await page.screenshot({path:`.screenshots/catalog-dark-${width}.png`})
   assert.deepEqual(issues,[])
-  console.log(`PASS ${width}: menú, galería de seis modelos, sin imágenes rotas, orden por precio, carga diferida y sin desbordamiento`)
+  console.log(`PASS ${width}: menú, galería de ocho modelos, Capra/Cedric con medidas, orden por precio, carga diferida y sin desbordamiento`)
   await page.close()
  }
 }finally{await browser.close()}

@@ -26,6 +26,8 @@ import arden from '../../assets/images/aparadores/arden/Blanco y duna/arden.webp
 import arian from '../../assets/images/aparadores/arian/agave-y-dorado/arian-agave.webp'
 import ars from '../../assets/images/aparadores/ars/A.webp'
 import bruyne from '../../assets/images/aparadores/bruyne/bruyne.webp'
+import capra from '../../assets/images/aparadores/capra/capra.webp'
+import cedric from '../../assets/images/aparadores/cedric/cedric.webp'
 
 export const images = {
   escanor,
@@ -41,6 +43,8 @@ export const images = {
   arian,
   ars,
   bruyne,
+  capra,
+  cedric,
 } as const
 
 export type ImageKey = keyof typeof images

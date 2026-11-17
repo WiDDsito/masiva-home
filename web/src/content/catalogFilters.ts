@@ -37,9 +37,10 @@ export const productFamilies = [
 
 export const catalogFilterCategories = [...categories.map(({id,name})=>({id,name})), ...productFamilies]
 
-/** Classification of the seven variants currently loaded, without importing new products or prices. */
+/** Product families for the models currently loaded in the local catalogue. */
 export const productFamilyById: Record<string,string> = {
   escanor:'aparadores', gina:'archivadores', yoshi:'escritorios',
   fabela:'mesas-de-centro', irene:'mesas-de-centro', kevin:'mesas-de-tv', runa:'roperos',
   aira:'aparadores', arden:'aparadores', arian:'aparadores', ars:'aparadores', bruyne:'aparadores',
+  capra:'aparadores', cedric:'aparadores',
 }

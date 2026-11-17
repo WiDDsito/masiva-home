@@ -225,3 +225,21 @@ La comprobación sobre producción detectó y corrigió una diferencia adicional
 Al cargar el documento, Inicio, Tienda, Showroom, Servicios y Contacto aparecen con un desplazamiento vertical de 8 px y opacidad progresiva. Cada enlace dura 420 ms con un escalonado de 60 ms, empezando a los 120 ms para acompañar la entrada del hero. Se anima el botón Tienda, no su contenedor, conservando el anclaje del desplegable al ancho del header. El logotipo y las acciones de búsqueda/tema/bolsa no se animan. En móvil entra solo el botón que abre el menú.
 
 La animación termina una vez y no se repite al navegar o cambiar cantidades. Se cancela al interactuar o enfocar la cabecera y al activar movimiento reducido. La navegación conserva su disponibilidad durante la entrada. `check:header-entry` comprueba ambos tamaños, ausencia de animación en otros controles, desplegable, navegación y teclado con movimiento reducido. Compilación local, sin respaldos ni publicación en GitHub.
+
+
+## Servicios informativos — 16 de noviembre de 2026
+
+La sección conserva su distribución, fotografía lateral con cambio por scroll y llenado circular al entrar/salir el puntero. Sus cuatro servicios son Diseño de interiores, Muebles personalizados, Delivery e Instalación y montaje. Las tarjetas son artículos informativos: no navegan, no muestran «Ver detalle» ni simulan botones, y no añaden paradas de tabulación. La animación respeta movimiento reducido. Las fotografías existentes siguen siendo referencias del catálogo, sin presentarlas como obras o instalaciones realizadas.
+
+«Cotizar mi proyecto» abre una consulta específica por WhatsApp y «Explorar catálogo» usa el fundido existente. Ambos están separados de las tarjetas y accesibles por teclado. Recojo y garantía permanecen en Ayuda; se retira la antigua promesa no confirmada de recojo gratuito de la sección Servicios.
+
+`check:services` verifica el contenido, la semántica informativa, ausencia de navegación al pulsar las tarjetas, origen circular en el cursor, crecimiento/vaciado del relleno, acciones separadas y movimiento reducido. Entrega local, sin respaldos ni subida a GitHub.
+
+
+## Nuevos aparadores Capra y Cedric — 16 de noviembre de 2026
+
+Se incorporan las carpetas `assets/images/aparadores/capra` y `cedric`, con seis fotografías WebP por modelo. Cada ficha usa su fotografía principal y galería de ambiente, detalles, interior y medidas; la lámina de medidas queda al final. Las imágenes originales se conservan, sin derivados ni metadatos `._` de macOS. Las fotos de detalle siguen cargándose al abrir la vista rápida.
+
+El catálogo suma 14 modelos y el filtro Aparadores muestra ocho. Capra tiene 120 × 85 × 45 cm y Cedric 180 × 80 × 40 cm (largo × alto × fondo), según sus láminas locales. SKU, nombre comercial del acabado y precio siguen pendientes de validación con Carga General: se usa «Acabado según fotografía» y «Precio por confirmar», con consulta por WhatsApp y sin compra a precio cero. Inicio conserva sus dos productos destacados.
+
+`check:catalog-visual` incluye ambas fichas, sus seis imágenes, medidas y consulta de precio a 320/390/768/1024/1440 px. Se actualizan las cantidades esperadas en las pruebas existentes de catálogo, menú y showroom, sin retirar comprobaciones. Entrega compilada en local; sin respaldos ni subida a GitHub.

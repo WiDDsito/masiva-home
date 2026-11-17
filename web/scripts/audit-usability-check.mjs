@@ -25,7 +25,7 @@ try {
    await page.locator('.mobile-shop summary').click()
    await page.locator('#mega-tienda-movil .mega__link').filter({hasText:'Aparadores'}).click()
   }
-  await page.waitForFunction(()=>document.querySelectorAll('.catalog-card').length===6)
+  await page.waitForFunction(()=>document.querySelectorAll('.catalog-card').length===8)
   await page.goBack()
   await page.waitForFunction(()=>document.querySelector('#catalog-search')?.value==='Arden')
   assert.equal(await page.getByLabel('Ordenar productos').inputValue(),'price-desc')

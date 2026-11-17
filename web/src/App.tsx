@@ -94,7 +94,7 @@ export function App() {
       <main id="contenido" tabIndex={-1} className="page-view" onClickCapture={event => {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
         const link = (event.target as Element).closest('a[href^="#catalogo"]')
-        catalogTransition.current = link?.closest('#showroom, #tienda .shop__catalog-link') ? 'showroom-catalog' : undefined
+        catalogTransition.current = link?.closest('#showroom, #tienda .shop__catalog-link, #servicios .services__actions') ? 'showroom-catalog' : undefined
       }}>
         {isCatalog ? (
           <Catalog key={params.category} focusSearch={params.focusSearch} initialCategory={params.category} />

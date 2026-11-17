@@ -49,7 +49,7 @@ try {
    await page.locator('#mega-tienda-movil').getByRole('button',{name:/Aparadores/}).first().click()
    await page.waitForURL(/categoria=aparadores/)
    await page.locator('.catalog-card').first().waitFor()
-   assert.equal(await page.locator('.catalog-card').count(),6)
+   assert.equal(await page.locator('.catalog-card').count(),8)
    assert.equal(await page.locator('.mobile-nav').count(),0)
   }
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth))

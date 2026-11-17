@@ -14,7 +14,7 @@ try {
  await link.hover();await page.waitForTimeout(500)
  await link.click()
  await page.waitForURL(/categoria=aparadores/)
- assert.equal(await page.locator('.catalog-card').count(),6)
+ assert.equal(await page.locator('.catalog-card').count(),8)
  assert.equal(await trigger.getAttribute('aria-expanded'),'false')
  console.log('PASS recorrido lento del cursor, selección de Aparadores y cierre tras navegar')
 }finally{await browser.close()}
