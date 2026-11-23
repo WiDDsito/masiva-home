@@ -5,6 +5,7 @@ import { catalogFinishes } from '../content/catalogMedia'
 import { useCartActions } from '../lib/CartContext'
 import { formatPEN } from '../lib/format'
 import { Button } from './Button'
+import { ProductGallery } from './ProductGallery'
 
 export function CatalogPreview({ product, onClose, closeLabel = 'Cerrar vista rápida' }: { product: DemoProduct; onClose: () => void; closeLabel?: string }) {
   const dialog = useRef<HTMLDialogElement>(null)
@@ -14,7 +15,6 @@ export function CatalogPreview({ product, onClose, closeLabel = 'Cerrar vista r�
   const { add } = useCartActions()
   const finishes = catalogFinishes(product)
   const selection = finishes[finish]
-  const image = selection.photos[photo]
   const priced = product.price > 0
   useEffect(() => {
     const element = dialog.current!
@@ -43,12 +43,11 @@ export function CatalogPreview({ product, onClose, closeLabel = 'Cerrar vista r�
   }}>
     <button autoFocus type="button" className="icon-btn catalog-preview__close" aria-label={closeLabel} onClick={() => void requestClose()}>×</button>
     <div className="catalog-preview__layout">
-      <div className="catalog-preview__gallery">
-        <div className="catalog-preview__stage">{image && <img className="catalog-preview__image" src={image.src} alt={`${product.name}, ${selection.name}. ${image.label}`} width="800" height="800" decoding="async" />}</div>
-        {selection.photos.length > 1 && <div className="catalog-preview__thumbnails" aria-label="Fotografías del producto">
-          {selection.photos.map((item, index) => <button type="button" key={item.src} aria-label={`Ver foto ${index + 1}: ${item.label}`} aria-pressed={index === photo} onClick={() => setPhoto(index)}><img src={item.src} alt="" width="72" height="72" loading="lazy" /></button>)}
-        </div>}
-      </div>
+      <ProductGallery selected={photo} onSelect={setPhoto} photos={selection.photos.map(photo => ({
+        src: photo.src,
+        alt: `${product.name}, ${selection.name}. ${photo.label}`,
+        label: photo.label,
+      }))} />
       <div className="catalog-preview__body">
         <p className="catalog-preview__subtitle">Vista rápida</p>
         <h2 id="catalog-preview-title">{product.name}</h2>

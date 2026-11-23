@@ -19,7 +19,7 @@ function MorphingRoom({ room, active, onSelect, zoom }: Pick<ShowroomProps, 'roo
   const scale = useRef(zoom)
   const invalidate = useThree(state => state.invalidate)
   const reduced = useReducedMotion()
-  useEffect(() => { invalidate() }, [room, active, zoom, reduced, invalidate])
+  useEffect(() => { invalidate() }, [room, zoom, reduced, invalidate])
   useFrame((_, rawDelta) => {
     if (reduced) {
       if (displayed !== room) { setDisplayed(room); invalidate() }
@@ -41,7 +41,7 @@ function MorphingRoom({ room, active, onSelect, zoom }: Pick<ShowroomProps, 'roo
     }
     if (Math.abs(progress.current - 1) > .001 || leaving || Math.abs(scale.current - zoom) > .001) invalidate()
   })
-  return <group ref={group}><RoomContents room={displayed} active={active} onSelect={onSelect} />{displayed === room && <ShowroomHotspots room={displayed} active={active} onSelect={onSelect} />}</group>
+  return <group ref={group}><RoomContents room={displayed} />{displayed === room && <ShowroomHotspots room={displayed} active={active} onSelect={onSelect} />}</group>
 }
 
 export function ShowroomScene({ room, active, onSelect, running, rotate, reset, zoom, pan }: ShowroomProps) {
@@ -73,7 +73,6 @@ export function ShowroomScene({ room, active, onSelect, running, rotate, reset, 
       travelling.current = false
       gl.domElement.dataset.cameraMoving = 'false'
       gl.domElement.dataset.cameraDistance = camera.position.distanceTo(controls.current?.target ?? lookAt.current).toFixed(4)
-      gl.domElement.dataset.cameraFocus = active ?? 'none'
     }
     else invalidate()
   })

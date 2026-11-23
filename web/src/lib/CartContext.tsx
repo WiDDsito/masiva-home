@@ -3,15 +3,20 @@ import type { ReactNode } from 'react'
 import { products } from '../content/demo'
 import { cartReducer, restoreCart } from './cart'
 import type { CartAction, CartFeedback, CartLine, CartState } from './cart'
+import { wooAddItemEndpoint } from './wooCart'
+import type { WooAddItem, WooCartSnapshot } from './wooCart'
 
 interface CartActions {
   setQuantity: (id: string, quantity: number) => void
   add: (id: string) => void
+  addWooItem: (item: WooAddItem) => Promise<void>
   setOpen: (open: boolean) => void
   dismissNotice: (id: number) => void
 }
 interface CartContextValue extends CartActions {
   lines: CartLine[]
+  wooCart: WooCartSnapshot | null
+  wooPending: boolean
   open: boolean
   count: number
   notice: CartFeedback | null
@@ -31,6 +36,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const current = useRef(state)
   const persistent = useRef(true)
   const [open, setOpen] = useState(false)
+  const [wooCart, setWooCart] = useState<WooCartSnapshot | null>(null)
+  const [wooPending, setWooPending] = useState(false)
+  const wooInFlight = useRef(false)
+  const wooToken = useRef<string | null>(null)
   const publish = useCallback((next: CartState) => { current.current = next; setState(next) }, [])
   useEffect(() => {
     const refresh = () => {
@@ -64,10 +73,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const product = products.find(item => item.id === id)
     if (product) mutate({ type: 'add', product })
   }, [mutate])
+  const addWooItem = useCallback(async (item: WooAddItem) => {
+    if (!import.meta.env.DEV || wooInFlight.current) return
+    wooInFlight.current = true
+    setWooPending(true)
+    try {
+      wooToken.current ??= crypto.randomUUID()
+      const response = await fetch(wooAddItemEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Cart-Token': wooToken.current },
+        credentials: 'omit',
+        body: JSON.stringify(item),
+      })
+      const data = await response.json().catch(() => null)
+      if (!response.ok) {
+        throw new Error(typeof data?.message === 'string' ? data.message : 'No pudimos añadir el producto al carrito simulado.')
+      }
+      if (!Array.isArray(data?.items) || !Number.isSafeInteger(data.items_count) || !data.totals) {
+        throw new Error('El carrito simulado devolvió una respuesta inválida.')
+      }
+      setWooCart(data)
+      setOpen(true)
+    } finally {
+      wooInFlight.current = false
+      setWooPending(false)
+    }
+  }, [])
   const dismissNotice = useCallback((id: number) => publish(cartReducer(current.current, { type: 'dismiss', id })), [publish])
-  const actions = useMemo(() => ({ add, setQuantity, setOpen, dismissNotice }), [add, setQuantity, setOpen, dismissNotice])
-  const count = state.lines.reduce((total, line) => total + line.quantity, 0)
-  const value = useMemo(() => ({ ...actions, lines: state.lines, notice: state.feedback, open, count }), [actions, state.lines, state.feedback, open, count])
+  const actions = useMemo(() => ({ add, addWooItem, setQuantity, setOpen, dismissNotice }), [add, addWooItem, setQuantity, setOpen, dismissNotice])
+  const count = state.lines.reduce((total, line) => total + line.quantity, wooCart?.items_count ?? 0)
+  const value = useMemo(() => ({ ...actions, lines: state.lines, wooCart, wooPending, notice: state.feedback, open, count }), [actions, state.lines, state.feedback, wooCart, wooPending, open, count])
   return <CartActionsContext.Provider value={actions}><CartContext.Provider value={value}>{children}</CartContext.Provider></CartActionsContext.Provider>
 }
 export function useCart() { const value = useContext(CartContext); if (!value) throw new Error('Falta CartProvider'); return value }

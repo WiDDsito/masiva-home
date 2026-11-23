@@ -8,6 +8,7 @@ interface Props {
   href?: string
   external?: boolean
   onClick?: () => void
+  disabled?: boolean
   type?: ButtonHTMLAttributes<HTMLButtonElement>['type']
   children: ReactNode
   className?: string
@@ -20,6 +21,7 @@ export function Button({
   href,
   external = false,
   onClick,
+  disabled = false,
   type = 'button',
   children,
   className,
@@ -42,7 +44,7 @@ export function Button({
   }
 
   return (
-    <Magnetic className={block ? 'magnetic--block' : undefined}><button aria-label={ariaLabel} className={classes} type={type} onClick={onClick}>
+    <Magnetic className={block ? 'magnetic--block' : undefined}><button aria-label={ariaLabel} className={classes} type={type} disabled={disabled} onClick={onClick}>
       {children}
     </button></Magnetic>
   )

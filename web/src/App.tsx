@@ -1,6 +1,8 @@
 import { transitionView } from './lib/viewTransition'
 import { useEffect, useRef, useState } from 'react'
 import { Catalog } from './blocks/Catalog'
+import './styles/home.css'
+import { WooProductDetails } from './blocks/WooProductDetails'
 import { CartProvider } from './lib/CartContext'
 import { Cart } from './components/Cart'
 import { Contact } from './blocks/Contact'
@@ -17,7 +19,9 @@ function isCatalogHash(hash: string) {
   return hash === '#catalogo' || hash.startsWith('#catalogo?')
 }
 function pageFor(hash: string) {
-  return isCatalogHash(hash) ? 'catalog' : hash === '#ayuda' || hash.startsWith('#ayuda?') ? 'help' : 'home'
+  if (isCatalogHash(hash)) return 'catalog'
+  if (hash.startsWith('#producto/')) return 'product'
+  return hash === '#ayuda' || hash.startsWith('#ayuda?') ? 'help' : 'home'
 }
 
 function catalogParams(hash: string) {
@@ -34,6 +38,10 @@ export function App() {
   const catalogTransition = useRef<'showroom-catalog' | undefined>(undefined)
   const isCatalog = isCatalogHash(hash)
   const page = pageFor(hash)
+  const [productId = '', catalogQuery = ''] = page === 'product' ? hash.slice('#producto/'.length).split('?', 2) : []
+  const numericId = Number(productId)
+  const wooProductId = /^[1-9]\d*$/.test(productId) && Number.isSafeInteger(numericId) ? numericId : null
+  const catalogHref = catalogQuery ? `#catalogo?${catalogQuery}` : '#catalogo'
   const helpTopic = page === 'help' ? new URLSearchParams(hash.split('?')[1]).get('tema') ?? 'preguntas' : ''
   const params = isCatalog ? catalogParams(hash) : { focusSearch: false, category: 'all' }
   useScrollAnimations(page !== 'home')
@@ -41,12 +49,12 @@ export function App() {
   useEffect(() => {
     const onHashChange = () => {
       const next = window.location.hash
-      const nextCatalog = isCatalogHash(next)
+      const nextPage = pageFor(next)
       const variant = catalogTransition.current
       catalogTransition.current = undefined
-      if (pageFor(next) !== page) transitionView(() => setHash(next), () => {
-        if (nextCatalog || pageFor(next) === 'help') window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
-      }, variant ?? (pageFor(next) === 'help' || page === 'help' ? 'showroom-catalog' : undefined))
+      if (nextPage !== page) transitionView(() => setHash(next), () => {
+        if (nextPage !== 'home') window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+      }, variant ?? (nextPage === 'help' || page === 'help' ? 'showroom-catalog' : undefined))
       else setHash(next)
     }
     window.addEventListener('hashchange', onHashChange)
@@ -54,9 +62,9 @@ export function App() {
   }, [page])
 
   useEffect(() => {
-    document.title = isCatalog ? 'Catálogo completo | Masiva Home' : page === 'help' ? 'Ayuda para tu compra | Masiva Home' : 'Masiva Home — Muebles que transforman tu hogar'
+    document.title = isCatalog ? 'Catálogo completo | Masiva Home' : page === 'product' ? 'Ficha del producto | Masiva Home' : page === 'help' ? 'Ayuda para tu compra | Masiva Home' : 'Masiva Home — Muebles que transforman tu hogar'
     const frame = requestAnimationFrame(() => {
-      if (page === 'help') {
+      if (page === 'help' || page === 'product') {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
         document.getElementById('contenido')?.focus({ preventScroll: true })
       } else if (isCatalog) {
@@ -69,7 +77,7 @@ export function App() {
       }
     })
     return () => cancelAnimationFrame(frame)
-  }, [isCatalog, page, helpTopic])
+  }, [isCatalog, page, helpTopic, productId])
 
   return (
     <CartProvider>
@@ -91,13 +99,15 @@ export function App() {
         window.location.hash = id === 'all' ? '#catalogo' : `#catalogo?categoria=${id}`
       }} />
 
-      <main id="contenido" tabIndex={-1} className="page-view" onClickCapture={event => {
+      <main id="contenido" tabIndex={-1} className={page === 'home' ? 'page-view home-page' : 'page-view'} onClickCapture={event => {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
         const link = (event.target as Element).closest('a[href^="#catalogo"]')
         catalogTransition.current = link?.closest('#showroom, #tienda .shop__catalog-link, #servicios .services__actions') ? 'showroom-catalog' : undefined
       }}>
         {isCatalog ? (
           <Catalog key={params.category} focusSearch={params.focusSearch} initialCategory={params.category} />
+        ) : page === 'product' ? (
+          <WooProductDetails key={productId} id={wooProductId} catalogHref={catalogHref} />
         ) : page === 'help' ? <Help topic={helpTopic} /> : (
           <>
             <Hero />

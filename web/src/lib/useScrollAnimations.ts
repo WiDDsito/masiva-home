@@ -7,17 +7,17 @@ export function useScrollAnimations(catalogView = false) {
     let dispose: (() => void) | undefined
     void (async () => {
       try {
-        const [{ gsap }, { ScrollTrigger }, { default: Lenis }] = await Promise.all([
-          import('gsap'), import('gsap/ScrollTrigger'), import('lenis'),
+        const [{ gsap }, { ScrollTrigger }, lenisModule] = await Promise.all([
+          import('gsap'), import('gsap/ScrollTrigger'), catalogView ? import('lenis') : undefined,
         ])
         if (cancelled) return
         gsap.registerPlugin(ScrollTrigger)
         const media = gsap.matchMedia()
         media.add('(prefers-reduced-motion: no-preference)', () => {
-          const lenis = new Lenis({ smoothWheel: true, duration: .85, anchors: { offset: -72 } })
-          lenis.on('scroll', ScrollTrigger.update)
-          const raf = (time: number) => lenis.raf(time * 1000)
-          gsap.ticker.add(raf)
+          const lenis = lenisModule && new lenisModule.default({ smoothWheel: true, duration: .85, anchors: { offset: -72 } })
+          lenis?.on('scroll', ScrollTrigger.update)
+          const raf = (time: number) => lenis?.raf(time * 1000)
+          if (lenis) gsap.ticker.add(raf)
           if (!catalogView) {
             gsap.fromTo('.hero__media', { scale: 1, yPercent: 0 }, { scale: 1.12, yPercent: 9, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: .5 } })
             gsap.to('.hero__inner', { y: -65, opacity: .25, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: .5 } })
@@ -37,7 +37,7 @@ export function useScrollAnimations(catalogView = false) {
             gsap.fromTo('.showroom__stage', { opacity: .65, scale: .97 }, { opacity: 1, scale: 1, ease: 'none', scrollTrigger: { trigger: '.showroom__stage', start: 'top bottom', end: 'top 35%', scrub: .4 } })
             gsap.to('.showroom__stage', { opacity: .7, y: -24, ease: 'none', scrollTrigger: { trigger: '.showroom', start: 'bottom 35%', end: 'bottom top', scrub: .4 } })
           }
-          return () => { gsap.ticker.remove(raf); lenis.destroy() }
+          return () => { if (lenis) { gsap.ticker.remove(raf); lenis.destroy() } }
         })
         dispose = () => media.revert()
         void document.fonts.ready.then(() => { if (!cancelled) ScrollTrigger.refresh() })

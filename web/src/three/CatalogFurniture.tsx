@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { ExtrudeGeometry, Shape } from 'three'
-import type { ThreeEvent } from '@react-three/fiber'
 import { Wood } from './StudioMaterials'
 
 export type Finish = 'wood' | 'darkWood' | 'ivory' | 'black' | 'gray' | 'metal'
@@ -13,12 +12,11 @@ export function Panel({ at, size, finish = 'wood', turn = 0 }: { at: [number, nu
 function Handle({ x, y, z, length = .11, vertical = false, finish = 'black' }: { x: number; y: number; z: number; length?: number; vertical?: boolean; finish?: Finish }) {
   return <Panel at={[x,y,z]} size={vertical ? [.012,length,.018] : [length,.012,.018]} finish={finish} />
 }
-export interface FurnitureProps { position: [number, number, number]; onSelect: (name: string) => void }
-function select(event: ThreeEvent<MouseEvent>, onSelect: FurnitureProps['onSelect'], name: string) { event.stopPropagation(); onSelect(name) }
+export interface FurnitureProps { position: [number, number, number] }
 
 /** Fabela: 110 × 40 × 60 cm; black top, open storage, right drawer and four black feet. */
-export function Fabela({ position, onSelect }: FurnitureProps) {
-  return <group position={position} onClick={event => select(event,onSelect,'Centro de mesa')}>
+export function Fabela({ position }: FurnitureProps) {
+  return <group position={position}>
     <Panel at={[0,.388,0]} size={[1.1,.025,.6]} finish="black" />
     <Panel at={[0,.132,0]} size={[1.1,.025,.58]} finish="darkWood" />
     <Panel at={[-.54,.26,0]} size={[.02,.25,.58]} finish="darkWood" />
@@ -33,8 +31,8 @@ export function Fabela({ position, onSelect }: FurnitureProps) {
   </group>
 }
 /** Kevin: 200 × 50 × 40 cm; gray doors and drawers, upper open compartments. */
-export function Kevin({ position, onSelect }: FurnitureProps) {
-  return <group position={position} onClick={event => select(event,onSelect,'Mesa de TV')}>
+export function Kevin({ position }: FurnitureProps) {
+  return <group position={position}>
     <Panel at={[0,.49,0]} size={[2,.02,.4]} />
     <Panel at={[0,.11,0]} size={[2,.025,.4]} />
     <Panel at={[0,.3,-.19]} size={[2,.36,.018]} />
@@ -56,8 +54,8 @@ function CutPanel({ points, finish }: { points: [number,number][]; finish: 'wood
 const escanorUpper: [number,number][] = [[-.65,.38],[-.23,.38],[.04,.63],[.65,.63],[.65,1],[-.65,1]]
 const escanorLower: [number,number][] = [[-.65,0],[.65,0],[.65,.5],[.04,.5],[-.23,.25],[-.65,.25]]
 /** Escanor: 130 × 100 × 35 cm; stepped white base and diagonal wood volume. */
-export function Escanor({ position, onSelect }: FurnitureProps) {
-  return <group position={position} onClick={event=>select(event,onSelect,'Aparador Escanor')}>
+export function Escanor({ position }: FurnitureProps) {
+  return <group position={position}>
     <CutPanel points={escanorUpper} finish="wood" /><CutPanel points={escanorLower} finish="ivory" />
     {[-.48,-.3].map(x=><Panel key={x} at={[x,.315,0]} size={[.012,.13,.19]} finish="ivory" />)}
     <Panel at={[-.215,.705,.178]} size={[.0015,.58,.001]} finish="darkWood" />
@@ -67,8 +65,8 @@ export function Escanor({ position, onSelect }: FurnitureProps) {
   </group>
 }
 /** Runa: 230 × 220 × 50 cm; six fronts, central wood slats and long side handles. */
-export function Runa({ position, onSelect }: FurnitureProps) {
-  return <group position={position} onClick={event=>select(event,onSelect,'Ropero')}>
+export function Runa({ position }: FurnitureProps) {
+  return <group position={position}>
     <Panel at={[0,1.1,-.24]} size={[2.3,2.2,.02]} finish="darkWood" />
     {[-1.135,1.135].map(x=><Panel key={x} at={[x,1.1,0]} size={[.03,2.2,.5]} finish="darkWood" />)}
     {[.025,2.175].map(y=><Panel key={y} at={[0,y,0]} size={[2.3,.05,.5]} finish="darkWood" />)}

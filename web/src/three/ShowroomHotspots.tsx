@@ -10,16 +10,21 @@ const positions: Record<string, [number, number, number]> = {
   runa: [.75, 1.25, -1.3],
 }
 
-/** DOM buttons follow the furniture in 3D without a continuous animation loop. */
-export function ShowroomHotspots({ room, active, onSelect }: { room: RoomId; active: string | null; onSelect: (name: string | null) => void }) {
-  return <>{showroomPieces.filter(piece => piece.room === room).map(piece => {
-    const product = products.find(item => item.id === piece.productId)!
-    const selected = active === piece.name
-    return <Html key={piece.productId} position={positions[piece.productId]} center occlude zIndexRange={[3, 1]} style={{ pointerEvents: 'none' }}>
-      <button type="button" className="showroom-hotspot" data-product-id={piece.productId} aria-label={`Explorar ${product.name}`} aria-pressed={selected} aria-controls="showroom-product" onPointerDown={event => event.stopPropagation()} onPointerUp={event => event.stopPropagation()} onClick={event => { event.stopPropagation(); onSelect(piece.name) }}>
+type ShowroomPiece = (typeof showroomPieces)[number]
+function ShowroomHotspot({ piece, selected, onSelect }: { piece: ShowroomPiece; selected: boolean; onSelect: (name: string) => void }) {
+  const name = products.find(item => item.id === piece.productId)?.name ?? piece.name
+
+  return <Html position={positions[piece.productId]} center occlude zIndexRange={[3, 1]} style={{ pointerEvents: 'none' }}>
+      <button type="button" className="showroom-hotspot" data-product-id={piece.productId} aria-label={`Explorar ${name}`} aria-expanded={selected} aria-pressed={selected} aria-controls={selected ? 'showroom-product' : undefined} onPointerDown={event => event.stopPropagation()} onPointerUp={event => event.stopPropagation()} onClick={event => { event.stopPropagation(); onSelect(piece.name) }}>
         <span className="showroom-hotspot__symbol" aria-hidden="true">{selected ? '✓' : '+'}</span>
-        <span className="showroom-hotspot__label" aria-hidden="true">{product.name}</span>
+        {!selected && <span className="showroom-hotspot__label" aria-hidden="true">{name}</span>}
       </button>
-    </Html>
-  })}</>
+  </Html>
+}
+
+/** DOM buttons follow the furniture in 3D without a continuous animation loop. */
+export function ShowroomHotspots({ room, active, onSelect }: { room: RoomId; active: string | null; onSelect: (name: string) => void }) {
+  return <>{showroomPieces.filter(piece => piece.room === room).map(piece => (
+    <ShowroomHotspot key={piece.productId} piece={piece} selected={active === piece.name} onSelect={onSelect} />
+  ))}</>
 }

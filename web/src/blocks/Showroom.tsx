@@ -1,40 +1,27 @@
-import { Button } from '../components/Button'
-import { useCartActions } from '../lib/CartContext'
-import { formatPEN } from '../lib/format'
-import { products } from '../content/demo'
-import { Magnetic } from '../components/Magnetic'
-import { rooms, showroomPieces as pieces } from '../content/showroom'
-import type { RoomId } from '../content/showroom'
-import { SplitText } from '../components/SplitText'
 import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { Magnetic } from '../components/Magnetic'
+import { SplitText } from '../components/SplitText'
+import { products } from '../content/demo'
+import { rooms, showroomCatalogHref, showroomPieces } from '../content/showroom'
+import type { RoomId } from '../content/showroom'
 import { useInView } from '../lib/useInView'
 
 const Showroom3D = lazy(() => import('../three/Showroom3D'))
-
+const roomIds = Object.keys(rooms) as RoomId[]
 
 class ShowroomBoundary extends Component<{ children: ReactNode; onUnavailable: () => void }, { failed: boolean }> {
   state = { failed: false }
   static getDerivedStateFromError() { return { failed: true } }
   componentDidCatch() { this.props.onUnavailable() }
-  render() {
-    return this.state.failed ? null : this.props.children
-  }
+  render() { return this.state.failed ? null : this.props.children }
 }
 
 export function Showroom() {
-  const { add } = useCartActions()
-  const [active, setActive] = useState<string | null>(null)
   const [room, setRoom] = useState<RoomId>('sala')
+  const [active, setActive] = useState<string | null>(null)
   const [pan, setPan] = useState(false)
   const [unavailable, setUnavailable] = useState(false)
-  const showPhotos = useCallback(() => { setUnavailable(true); setRotate(false); setPan(false) }, [])
-  const selectPiece = (name: string | null) => {
-    const selected = pieces.find(p => p.name === name)
-    if (!name) setActive(null)
-    else if (selected) { setRoom(selected.room); setActive(current => current === name ? null : name); setRotate(false) }
-  }
-  const selectRoom = (id: RoomId) => { setRoom(id); setActive(null); setZoom(1) }
   const [rotate, setRotate] = useState(false)
   const [inViewport, setInViewport] = useState(false)
   const [pageVisible, setPageVisible] = useState(!document.hidden)
@@ -42,10 +29,12 @@ export function Showroom() {
   const [reset, setReset] = useState(0)
   const stage = useRef<HTMLDivElement>(null)
   const { ref, visible } = useInView<HTMLElement>('300px')
-  const piece = pieces.find(p => p.name === active)
-  const product = products.find(p => p.id === piece?.productId)
-  const visiblePieces = pieces.filter(p => p.room === room)
-  const photoProduct = product ?? products.find(item => item.id === visiblePieces[0]?.productId)
+  const showFallback = useCallback(() => { setUnavailable(true); setRotate(false); setPan(false) }, [])
+  const visiblePieces = showroomPieces.filter(piece => piece.room === room)
+  const selected = visiblePieces.find(piece => piece.name === active)
+  const selectPiece = (name: string) => { setActive(current => current === name ? null : name); setRotate(false) }
+  const selectRoom = (id: RoomId) => { setRoom(id); setActive(null); setZoom(1) }
+  const selectedProduct = products.find(product => product.id === selected?.productId)
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => setInViewport(entry.isIntersecting))
@@ -56,58 +45,71 @@ export function Showroom() {
   }, [])
 
   return (
-    <section ref={ref} className="showroom on-dark" id="showroom" aria-labelledby="showroom-title" onKeyDown={event => { if (event.key === 'Escape') setActive(null) }}>
-      <div className="container showroom__intro">
-        <h2 id="showroom-title"><SplitText text="Dale espacio a tus ideas." /></h2>
-        <p>{unavailable ? 'Elige un ambiente y consulta sus muebles en fotografías.' : 'Un showroom para explorar con calma. Elige una pieza y descubre otra perspectiva.'}</p>
-      </div>
-      <div className={`showroom__experience ${unavailable ? 'showroom__experience--photos' : ''}`}>
-        <div className="showroom__stage" id="room-viewport" role="tabpanel" aria-labelledby={`room-tab-${room}`} ref={stage} aria-label="Visor de muebles en 3D" aria-describedby="showroom-help">
-          {unavailable ? <div className="showroom__photos">
-            <img src={photoProduct?.image} alt={`Fotografía del catálogo: ${photoProduct?.name ?? rooms[room].label}`} width="1000" height="800" />
-            <div className="showroom__photo-note"><p role="status">La vista 3D no está disponible. Puedes explorar las fotografías del catálogo.</p><a className="link" href={`#catalogo?categoria=${room}`}>Ver fotos y medidas</a></div>
-          </div> : visible && <ShowroomBoundary onUnavailable={showPhotos}><Suspense fallback={<span className="showroom__loading" role="status">Preparando el showroom…</span>}>
-            <Showroom3D room={room} pan={pan} active={active} onSelect={selectPiece} running={inViewport && pageVisible} rotate={rotate} reset={reset} zoom={zoom} onUnavailable={showPhotos} />
-          </Suspense></ShowroomBoundary>}
-          <p className="showroom__hint" id="showroom-help">{unavailable ? 'Elige un producto para ver su fotografía, precio y medidas.' : 'Pulsa + para explorar un mueble · Arrastra para girar'}</p>
+    <section ref={ref} className="showroom on-dark" id="showroom" aria-labelledby="showroom-title" onKeyDown={event => {
+      if (event.key !== 'Escape' || !selected) return
+      const marker = stage.current?.querySelector<HTMLButtonElement>(`[data-product-id="${selected.productId}"]`)
+      setActive(null)
+      marker?.focus({ preventScroll: true })
+    }}>
+      <div className="container">
+        <div className="showroom__intro">
+          <h2 id="showroom-title"><SplitText text="Dale espacio a tus ideas." /></h2>
+          <p>Explora tres ambientes en 3D, desde la sala hasta el dormitorio.</p>
         </div>
-        {(!unavailable || product) && <div id="showroom-product" className={`showroom__caption ${product ? 'has-selection' : ''}`} key={active ?? room} aria-live="polite">
-          {product && <img className="showroom__reference" src={product.image} alt={`Fotografía de referencia de ${product.name}`} />}
-          <h3>{product?.name ?? rooms[room].description}</h3>
-          <p>{piece?.detail ?? 'Selecciona un mueble para acercarte. Vuelve a pulsarlo o elige Vista general para regresar.'}</p>
-          {product && <>
-            <p className="showroom__material">{product.dimensions} · {product.color}</p>
-            <div className="showroom__purchase">
-              <p className="showroom__price">{formatPEN(product.price)}</p>
-              <Button ariaLabel={`Agregar ${product.name} al carrito`} onClick={() => add(product.id)}>Agregar al carrito</Button>
-              <p className="showroom__availability">Disponibilidad y entrega por confirmar.</p>
+        <div className="showroom__controls">
+          <div className="showroom__rooms" role="tablist" aria-label="Ambientes del showroom">
+            {roomIds.map((id, index) => <Magnetic key={id}><button type="button" role="tab" id={`room-tab-${id}`} aria-selected={room === id} tabIndex={room === id ? 0 : -1} aria-controls="room-viewport" onClick={() => selectRoom(id)} onKeyDown={event => {
+              if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+              event.preventDefault()
+              const next = event.key === 'Home' ? 0 : event.key === 'End' ? roomIds.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + roomIds.length) % roomIds.length
+              selectRoom(roomIds[next])
+              event.currentTarget.closest('[role="tablist"]')?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next].focus()
+            }}>{rooms[id].label}</button></Magnetic>)}
+          </div>
+          <div className="showroom__toolbar">
+            {!unavailable && <div className="showroom__tools">
+              <button type="button" aria-pressed={rotate} onClick={() => setRotate(value => !value)}>{rotate ? 'Pausar giro' : 'Giro automático'}</button>
+              <button type="button" aria-pressed={pan} onClick={() => setPan(value => !value)}>Desplazar</button>
+              <button type="button" aria-label="Acercar ambiente" disabled={zoom >= 1.8} onClick={() => setZoom(value => Math.min(1.8, value + .2))}>+</button>
+              <button type="button" aria-label="Alejar ambiente" disabled={zoom <= .8} onClick={() => setZoom(value => Math.max(.8, value - .2))}>−</button>
+              <button type="button" onClick={() => { setZoom(1); setPan(false); setActive(null); setReset(value => value + 1) }}>Restablecer vista</button>
+            </div>}
+            <Magnetic><a className="link" href="#catalogo">Explorar el catálogo</a></Magnetic>
+          </div>
+        </div>
+      </div>
+      <div
+        className={selected ? 'showroom__layout showroom__layout--selected' : 'showroom__layout'}
+        id="room-viewport"
+        role="tabpanel"
+        aria-labelledby={`room-tab-${room}`}
+        style={{ backgroundColor: rooms[room].background }}
+      >
+        <div className="showroom__stage" ref={stage}>
+          {unavailable ? <div className="showroom__fallback">
+            <h3>{rooms[room].label}</h3>
+            <p role="status">La vista 3D no está disponible en este dispositivo.</p>
+            <div className="showroom__fallback-links">
+              {visiblePieces.map(piece => (
+                <button className="link" type="button" key={piece.productId} data-product-id={piece.productId} aria-pressed={active === piece.name} aria-controls={active === piece.name ? 'showroom-product' : undefined} onClick={() => selectPiece(piece.name)}>
+                  {products.find(product => product.id === piece.productId)?.name ?? piece.name}
+                </button>
+              ))}
             </div>
-          </>}
-        </div>}
-      </div>
-      <div className="container showroom__rooms" role="tablist" aria-label="Ambientes del showroom">
-        {(Object.keys(rooms) as RoomId[]).map((id, index, list) => <Magnetic key={id}><button type="button" role="tab" id={`room-tab-${id}`} aria-selected={room === id} tabIndex={room === id ? 0 : -1} aria-controls="room-viewport" onClick={() => selectRoom(id)} onKeyDown={event => {
-          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
-          event.preventDefault()
-          const next = event.key === 'Home' ? 0 : event.key === 'End' ? list.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + list.length) % list.length
-          selectRoom(list[next]); event.currentTarget.closest('[role="tablist"]')?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next].focus()
-        }}>{rooms[id].label}</button></Magnetic>)}
-      </div>
-      <div className="container showroom__toolbar">
-        <div className="showroom__legend" role="group" aria-label={`Productos de ${rooms[room].label}`}>
-          {visiblePieces.map(p => <Magnetic key={p.name}><button type="button" aria-pressed={active === p.name} className={active === p.name ? 'is-active' : ''} onClick={() => selectPiece(p.name)}>{p.name}</button></Magnetic>)}
+          </div> : visible && <ShowroomBoundary onUnavailable={showFallback}><Suspense fallback={<span className="showroom__loading" role="status">Preparando el showroom…</span>}>
+            <Showroom3D room={room} active={active} onSelect={selectPiece} pan={pan} running={inViewport && pageVisible} rotate={rotate} reset={reset} zoom={zoom} onUnavailable={showFallback} />
+          </Suspense></ShowroomBoundary>}
+          {!unavailable && !active && <p className="showroom__hint">Arrastra para girar el ambiente o pulsa + para explorar un mueble.</p>}
         </div>
-        {!unavailable && <div className="showroom__tools">
-          <button type="button" aria-pressed={active === null} onClick={() => selectPiece(null)}>Vista general</button>
-          <button type="button" aria-pressed={rotate} onClick={() => setRotate(v => !v)} aria-label={rotate ? 'Pausar giro automático' : 'Activar giro automático'}>{rotate ? 'Pausar giro' : 'Giro automático'}</button>
-          <button type="button" aria-pressed={pan} onClick={() => setPan(v => !v)}>Desplazar</button>
-          <button type="button" aria-label="Acercar mueble" disabled={zoom >= 1.8} onClick={() => setZoom(v => Math.min(1.8, v + .2))}>+</button>
-          <button type="button" aria-label="Alejar mueble" disabled={zoom <= .8} onClick={() => setZoom(v => Math.max(.8, v - .2))}>−</button>
-          <button type="button" onClick={() => { setZoom(1); setActive(null); setPan(false); setReset(v => v + 1) }}>Restablecer vista</button>
-        </div>}
-        <Magnetic><a className="link" href="#catalogo">Explorar el catálogo</a></Magnetic>
+        {selected && <article id="showroom-product" className="showroom__product-card" aria-labelledby="showroom-product-title">
+          {selectedProduct?.image && <img src={selectedProduct.image} alt={selectedProduct.name} width="88" height="88" decoding="async" />}
+          <h3 id="showroom-product-title">{selectedProduct?.name ?? selected.name}</h3>
+          <p>{selected.detail}</p>
+          {selectedProduct && <p className="showroom__product-specs">{selectedProduct.dimensions} · {selectedProduct.color}</p>}
+          <p className="showroom__product-price">Ver precio en el catálogo</p>
+          <a className="btn btn--primary" href={showroomCatalogHref(selected)}>Buscar en el catálogo</a>
+        </article>}
       </div>
-      <p className="container showroom__disclaimer">{unavailable ? 'Fotografías de referencia del catálogo. Consulta la ficha y confirma los detalles antes de comprar.' : 'Reconstrucciones 3D basadas en las fotografías y medidas del catálogo. Algunos detalles no visibles en las fotos son aproximados; consulta la ficha antes de comprar.'}</p>
     </section>
   )
 }

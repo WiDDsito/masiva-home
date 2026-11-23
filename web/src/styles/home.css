@@ -1,0 +1,148 @@
+/* Native document scrolling gives tall sections room to scroll between snap points. */
+:root:has(.home-page) {
+  scroll-padding-block-start: var(--header-h);
+  scroll-snap-type: y proximity;
+}
+
+.home-page > :is(#inicio, #tienda, #showroom, #servicios, #contacto) {
+  scroll-margin-block-start: 0;
+  scroll-snap-align: start;
+}
+
+.home-page > :is(#tienda, #showroom, #contacto) {
+  min-block-size: calc(100svh - var(--header-h));
+  display: grid;
+  align-content: center;
+  padding-block: clamp(2rem, 3.5vw, 3.25rem);
+}
+
+.home-page #tienda .section__head {
+  justify-items: center;
+  max-inline-size: 58ch;
+  margin-inline: auto;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.home-page .products--preview { max-width: 51rem; margin: 1.5rem auto 0; }
+.home-page .shop__catalog-link { margin-top: 1.5rem; }
+.home-page .shop__note { text-align: center; }
+.home-page .showroom__intro {
+  display: grid;
+  justify-items: center;
+  gap: .75rem;
+  padding-bottom: 1.25rem;
+  text-align: center;
+}
+
+.home-page .showroom__intro h2 { max-width: none; }
+.home-page .showroom__intro p { max-width: 50ch; }
+.home-page .showroom__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .5rem clamp(1rem, 3vw, 3rem);
+  margin-bottom: 1rem;
+}
+
+.home-page .showroom__rooms { justify-content: center; flex-wrap: wrap; padding: 0; }
+.home-page .showroom__layout {
+  --showroom-stage-height: clamp(23rem, 62svh, 47rem);
+  width: min(100rem, calc(100% - clamp(1.5rem, 4vw, 4rem)));
+  margin-inline: auto;
+}
+
+.home-page .showroom__stage { height: var(--showroom-stage-height); min-height: 0; }
+.home-page .showroom__toolbar { padding: 0; justify-content: center; gap: .25rem 1rem; }
+.home-page .showroom__tools { justify-content: center; gap: 0 .375rem; }
+.home-page .showroom__toolbar button { padding-inline: .625rem; }
+.showroom__fallback-links { display: flex; justify-content: center; flex-wrap: wrap; gap: .25rem 1rem; }
+.showroom__fallback-links button { min-height: 44px; color: inherit; cursor: pointer; }
+.showroom__fallback {
+  display: grid;
+  height: 100%;
+  align-content: center;
+  justify-items: center;
+  gap: .75rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.home-page .contact__grid { align-items: center; }
+.home-page .contact__list { margin-top: var(--space-5); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.home-page .contact__value { margin: 0; overflow-wrap: anywhere; }
+
+.contact__form {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.contact__form h3, .contact__retail h3 { font-size: var(--text-xl); }
+.contact__form > p { color: var(--text-muted); font-size: var(--text-sm); }
+.contact__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem 1rem; }
+.contact__fields label { display: grid; gap: .35rem; align-content: start; font-size: var(--text-sm); }
+.contact__field--wide { grid-column: 1 / -1; }
+
+.contact__fields :is(input, textarea) {
+  width: 100%;
+  min-height: 44px;
+  padding: .6rem .75rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.contact__fields textarea { resize: vertical; }
+.contact__submit { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem 1rem; }
+
+.contact__retail {
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.contact__retail-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .65rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact__retail-link {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  width: clamp(6.1rem, 16vw, 8.5rem);
+  height: 3.75rem;
+  padding: .5rem .75rem;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+.contact__retail-link:hover { border-color: var(--accent); }
+.contact__retail-link--promart { background: #ff6000; }
+.contact__retail-link--plaza-vea { background: #ff0800; }
+.contact__retail-link img { width: 100%; height: 100%; min-width: 0; min-height: 0; object-fit: contain; }
+
+@media (max-width: 640px) {
+  .home-page .contact__grid { grid-template-columns: 1fr; }
+  .contact__fields { grid-template-columns: 1fr; }
+  .home-page .showroom__rooms button { padding-inline: .875rem; }
+  .home-page .showroom__layout { --showroom-stage-height: clamp(20rem, 62svh, 33rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:has(.home-page) { scroll-snap-type: none; }
+}

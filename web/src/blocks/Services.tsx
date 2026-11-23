@@ -40,8 +40,7 @@ export function Services() {
         <div className="section__head" data-reveal>
           <h2 className="section__title" id="servicios-title"><SplitText text="Servicios" /></h2>
           <p className="section__lead">
-            Encuentra apoyo para diseñar tu espacio, personalizar tus muebles y coordinar
-            su entrega e instalación.
+            Encuentra apoyo para diseñar tu espacio, personalizar tus muebles y coordinar su entrega.
           </p>
           <div className="services__actions">
             <Button href={`${contact.whatsapp.split('?')[0]}?text=${encodeURIComponent('Hola, quisiera cotizar un proyecto de diseño de interiores o muebles personalizados.')}`} external>Cotizar mi proyecto</Button>
@@ -51,7 +50,7 @@ export function Services() {
 
         <div className="services-layout">
         <aside className="services-story" aria-label="Servicios para tu espacio">
-          <div className="services-story__media">{storyImages.map((src, index) => <img key={src} src={src} alt={index === step ? 'Mueble de la colección Masiva Home' : ''} aria-hidden={index !== step} loading="lazy" className={index === step ? 'is-active' : ''} />)}</div>
+          <div className="services-story__media">{storyImages.map((src, index) => src && <img key={src} src={src} alt={index === step ? 'Mueble de la colección Masiva Home' : ''} aria-hidden={index !== step} loading="lazy" className={index === step ? 'is-active' : ''} />)}</div>
           <div className="services-story__progress" aria-hidden="true">{services.map((_, index) => <span key={index} className={index <= step ? 'is-active' : ''} />)}</div>
           <p className="services-story__title" aria-live="polite">{services[step].title}</p>
           <p>De elegir tu pieza a encontrarle su lugar.</p>

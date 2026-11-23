@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { products } from '../content/demo'
-import { productFamilies, productFamilyById } from '../content/catalogFilters'
+import { categoryPreviewImage } from '../content/images'
+import { productFamilies } from '../content/catalogFilters'
 import { catalogGroups } from '../content/catalogMedia'
 
 const shortcuts = ['aparadores', 'mesas-de-centro', 'mesas-de-tv', 'roperos', 'escritorios']
@@ -11,7 +11,7 @@ export function CatalogMenu({ category, onSelect }: { category: string; onSelect
   const root = useRef<HTMLElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
   const family = productFamilies.find(item => item.id === preview)
-  const photo = products.find(product => productFamilyById[product.id] === preview)
+  const image = categoryPreviewImage(preview)
   useEffect(() => {
     if (!open) return
     if (window.matchMedia('(max-width: 760px)').matches) root.current?.scrollIntoView({ block: 'start', behavior: 'instant' })
@@ -36,7 +36,7 @@ export function CatalogMenu({ category, onSelect }: { category: string; onSelect
         {catalogGroups.map(group => <div key={group.name}><h2>{group.name}</h2>{group.ids.map(id => <button type="button" key={id} aria-pressed={category === id} onMouseEnter={() => setPreview(id)} onFocus={() => setPreview(id)} onClick={() => choose(id)}>{productFamilies.find(item => item.id === id)?.name}</button>)}</div>)}
       </div>
       <div className="catalog-menu__preview">
-        {photo?.image ? <img src={photo.image} alt={family?.name} width="400" height="300" /> : <div className="catalog-menu__placeholder">Encuentra tu próxima pieza</div>}
+        {image ? <img src={image} alt={family?.name} width="400" height="300" /> : <div className="catalog-menu__placeholder">Encuentra tu próxima pieza</div>}
         <strong>{family?.name}</strong>
         <button type="button" onClick={() => choose(preview)}>Ver categoría <span aria-hidden="true">↗</span></button>
       </div>

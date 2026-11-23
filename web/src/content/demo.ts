@@ -255,8 +255,8 @@ export const services = [
     accent: false,
   },
   {
-    title: 'Instalación y montaje',
-    text: 'Coordina la instalación y el montaje de tus muebles. Consulta los detalles del servicio antes de confirmar tu compra.',
+    title: 'Producto ya ensamblado',
+    text: 'En la ficha de cada mueble puedes consultar si se entrega armado y las condiciones de instalación.',
     accent: false,
   },
 ]

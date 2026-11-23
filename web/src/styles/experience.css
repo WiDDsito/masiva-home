@@ -68,6 +68,53 @@
 /* The + markers belong to sellable catalogue furniture, not room decoration. */
 .showroom__caption, .showroom__hint { z-index: 4; }
 .showroom-hotspot { position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 4px; border: 1px solid rgb(255 255 255 / .75); border-radius: 50%; background: rgb(25 24 23 / .16); color: var(--color-charcoal); cursor: pointer; pointer-events: auto; touch-action: manipulation; }
+.showroom__layout {
+  --showroom-card-inset: clamp(.75rem, 2.4vw, 1.5rem);
+  min-width: 0;
+}
+.showroom__layout > .showroom__stage { background: transparent; }
+.showroom__layout--selected { display: grid; gap: .75rem; align-items: start; }
+.showroom__product-card {
+  width: min(27rem, calc(100% - 2 * var(--showroom-card-inset)));
+  min-width: 0;
+  margin: 0 auto var(--showroom-card-inset);
+  overflow-wrap: anywhere;
+  padding: clamp(.625rem, 1.4vw, 1rem);
+  color: var(--color-charcoal);
+  background: rgba(245, 243, 239, .96);
+  border: 1px solid rgba(25, 24, 23, .14);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(25, 24, 23, .14);
+  font-size: .8125rem;
+  line-height: 1.5;
+}
+.showroom__product-card img { width: clamp(3.25rem, 6vw, 5.5rem); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); }
+.showroom__product-card h3 { margin-block: .75rem; font: 500 clamp(1.375rem, 2.5vw, 2.25rem)/1.05 var(--font-display); }
+.showroom__product-card p + p { margin-top: .75rem; }
+.showroom__product-specs { color: rgba(25, 24, 23, .77); }
+.showroom__product-price { font-size: .9375rem; font-weight: 700; }
+.showroom__product-card .btn {
+  margin-top: .75rem;
+  padding: .5rem .875rem;
+  min-height: 44px;
+  background: var(--color-brass);
+  color: var(--color-charcoal);
+  text-align: center;
+  font-size: .8125rem;
+}
+.showroom__product-card .btn:hover { background: var(--color-brass-light); }
+.showroom__product-card .btn:focus-visible { outline-color: var(--color-charcoal); }
+@media (min-width: 769px) {
+  .showroom__layout--selected { grid-template-columns: clamp(13rem, 23%, 17rem) minmax(0, 1fr); }
+  .showroom__layout--selected .showroom__stage { grid-area: 1 / 2; }
+  .showroom__product-card {
+    grid-area: 1 / 1;
+    width: auto;
+    margin: var(--showroom-card-inset) 0 var(--showroom-card-inset) var(--showroom-card-inset);
+    max-block-size: calc(var(--showroom-stage-height) - 2 * var(--showroom-card-inset));
+    overflow-y: auto;
+  }
+}
 .showroom-hotspot:focus-visible { outline: 2px solid var(--color-charcoal); outline-offset: 3px; }
 .showroom-hotspot__symbol { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--color-ivory); box-shadow: 0 2px 12px rgb(0 0 0 / .18); font: 500 1.5rem/1 var(--font-sans); transition: background 180ms, transform 180ms; }
 .showroom-hotspot:hover .showroom-hotspot__symbol, .showroom-hotspot:focus-visible .showroom-hotspot__symbol, .showroom-hotspot[aria-pressed=true] .showroom-hotspot__symbol { background: var(--color-brass-light); transform: scale(1.06); }

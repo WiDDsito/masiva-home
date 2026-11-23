@@ -1,50 +1,58 @@
-/**
- * Imágenes reales del proyecto.
- *
- * Convención de nombres (alineada con Drive): prefijo de categoría + modelo.
- *   ap    → aparadores
- *   acvd  → archivadores
- *   ect   → escritorios
- *   mdc   → mesas de centro
- *   mdtv  → mesas de TV
- *   rp    → roperos
- *
- * Si una imagen falta, los componentes caen al marco de «fotografía pendiente».
- */
-import escanor from '../../assets/images/aparadores/escanor/ap-escanor.webp'
-import gina from '../../assets/images/archivadores/acvd-gina.webp'
-import yoshi from '../../assets/images/escritorios/ect-yoshi.webp'
-import fabela from '../../assets/images/mesas-de-centro/mdc-fabela.webp'
-import irene from '../../assets/images/mesas-de-centro/mdc-irene.webp'
-import kevin from '../../assets/images/mesas-de-tv/mdtv-kevin.webp'
-import runa from '../../assets/images/roperos/rp-runa.webp'
 import logo from '../../assets/images/logo/masiva-home-logo.webp'
 
-/* Aparadores adicionales (imágenes de Drive, «por mientras»). */
-import aira from '../../assets/images/aparadores/aira/aira.webp'
-import arden from '../../assets/images/aparadores/arden/Blanco y duna/arden.webp'
-import arian from '../../assets/images/aparadores/arian/agave-y-dorado/arian-agave.webp'
-import ars from '../../assets/images/aparadores/ars/A.webp'
-import bruyne from '../../assets/images/aparadores/bruyne/bruyne.webp'
-import capra from '../../assets/images/aparadores/capra/capra.webp'
-import cedric from '../../assets/images/aparadores/cedric/cedric.webp'
+const root = '../../assets/images/'
+const files = import.meta.glob<string>([
+  '../../assets/images/**/*.{webp,jpg,jpeg,png,avif}',
+  '!../../assets/images/**/._*',
+  '!../../assets/images/logo/**',
+], { eager: true, query: '?url', import: 'default' })
+
+// Use only files that are present while the local image collection is being updated.
+const localImages = new Map(Object.entries(files).map(([path, src]) => [
+  path.slice(root.length).normalize('NFC'), src,
+] as const))
 
 export const images = {
-  escanor,
-  gina,
-  yoshi,
-  fabela,
-  irene,
-  kevin,
-  runa,
   logo,
-  aira,
-  arden,
-  arian,
-  ars,
-  bruyne,
-  capra,
-  cedric,
+  escanor: localImages.get('aparadores/escanor/ap-escanor.webp') ?? localImages.get('aparadores/ap-escanor-hover.webp'),
+  gina: localImages.get('archivadores/acvd-gina.webp') ?? localImages.get('archivadores/acvd-gina-hover.webp'),
+  yoshi: localImages.get('escritorios/ect-yoshi.webp'),
+  fabela: localImages.get('mesas-de-centro/mdc-fabela.webp'),
+  irene: localImages.get('mesas-de-centro/mdc-irene.webp'),
+  kevin: localImages.get('mesas-de-tv/mdtv-kevin.webp'),
+  runa: localImages.get('roperos/rp-runa.webp'),
+  aira: localImages.get('aparadores/aira/aira.webp'),
+  arden: localImages.get('aparadores/arden/Blanco y duna/arden.webp'),
+  arian: localImages.get('aparadores/arian/agave-y-dorado/arian-agave.webp'),
+  ars: localImages.get('aparadores/ars/A.webp'),
+  bruyne: localImages.get('aparadores/bruyne/bruyne.webp'),
+  capra: localImages.get('aparadores/capra/capra.webp'),
+  cedric: localImages.get('aparadores/cedric/cedric.webp'),
 } as const
 
 export type ImageKey = keyof typeof images
+
+const categoryFolders = new Map([
+  ['comodas-cajoneras', 'comodas'],
+  ['counters-recibidores', 'counters'],
+  ['mesas-consola', 'mesas-consolas'],
+  ['muebles-de-bano', 'mueble-de-baño'],
+  ['percheros', 'perchero'],
+  ['soportes-de-cama', 'soporte-de-cama'],
+  ['casas-mascotas', 'pet-house'],
+  ['carpetas-pupitres', 'carpetas'],
+])
+
+const categoryPreviews = new Map<string, { src: string; isHover: boolean }>()
+for (const [path, src] of localImages) {
+  const [folder, file, ...nested] = path.split('/')
+  if (!file || nested.length) continue
+
+  const isHover = /-hover\.[^.]+$/i.test(file)
+  const current = categoryPreviews.get(folder)
+  if (!current || (isHover && !current.isHover)) categoryPreviews.set(folder, { src, isHover })
+}
+
+export function categoryPreviewImage(category: string) {
+  return categoryPreviews.get(categoryFolders.get(category) ?? category)?.src
+}

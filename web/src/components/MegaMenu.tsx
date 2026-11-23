@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { products } from '../content/demo'
+import { categoryPreviewImage } from '../content/images'
 import { productFamilies, productFamilyById } from '../content/catalogFilters'
 
 const groups = [
@@ -13,7 +14,7 @@ const countFor = (id: string) => products.filter(product => productFamilyById[pr
 export function MegaMenu({ onSelect, mobile = false }: { onSelect: (id: string) => void; mobile?: boolean }) {
   const [hovered, setHovered] = useState('aparadores')
   const featured = productFamilies.find(category => category.id === hovered)!
-  const photo = products.find(product => productFamilyById[product.id] === hovered)
+  const image = categoryPreviewImage(hovered)
   return <div className={`mega${mobile ? ' mega--mobile' : ''}`} id={mobile ? 'mega-tienda-movil' : 'mega-tienda'} data-lenis-prevent>
     <div className="mega__inner">
       <div className="mega__browse">
@@ -23,7 +24,7 @@ export function MegaMenu({ onSelect, mobile = false }: { onSelect: (id: string) 
         </div>
       </div>
       <button type="button" className="mega__feature" aria-label={`Ver ${featured.name.toLowerCase()}`} onClick={() => onSelect(featured.id)}>
-        <img className="mega__feature-img" src={photo?.image} alt={featured.name} loading="lazy" width="400" height="300" />
+        {image && <img className="mega__feature-img" src={image} alt={featured.name} loading="lazy" width="400" height="300" />}
         <span className="mega__feature-label"><strong>{featured.name}</strong><span>{countFor(featured.id)} {countFor(featured.id) === 1 ? 'modelo' : 'modelos'} · Explorar categoría</span></span>
       </button>
     </div>

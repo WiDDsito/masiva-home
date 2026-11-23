@@ -47,7 +47,7 @@ function Architecture({ room }: {room:RoomId}) {
     <group position={[-.6,1.8,-1.98]}><Panel at={[0,0,0]} size={[1.15,.75,.025]} finish="darkWood" /><mesh position-z={.018}><planeGeometry args={[1.08,.68]} /><meshStandardMaterial color="#ded9cf" roughness={1} /></mesh><mesh position={[-.18,0,.025]}><circleGeometry args={[.21,32]} /><meshStandardMaterial color="#a59176" roughness={1} /></mesh><mesh position={[.22,-.1,.025]}><planeGeometry args={[.26,.35]} /><meshStandardMaterial color="#6b7774" roughness={1} /></mesh></group>
   </>
 }
-export function RoomContents({ room, onSelect }: {room:RoomId;active:string|null;onSelect:(name:string|null)=>void}) {
+export function RoomContents({ room }: { room: RoomId }) {
   return <>
     <Architecture room={room} />
     {room==='sala' && <>
@@ -60,9 +60,9 @@ export function RoomContents({ room, onSelect }: {room:RoomId;active:string|null
       </group>
       <mesh position={[0,.003,.1]} rotation-x={-Math.PI/2} receiveShadow><planeGeometry args={[3.1,2.7]} /><Fabric color="#c2b9a9" /></mesh>
       <Contact at={[-.3,.008,.3]} size={[1.5,.95]} />
-      <Fabela position={[-.3,0,.3]} onSelect={onSelect} />
+      <Fabela position={[-.3,0,.3]} />
       <group position={[.9,0,-1.7]}>
-        <Kevin position={[0,0,0]} onSelect={onSelect} />
+        <Kevin position={[0,0,0]} />
         
         <Panel at={[0,1.18,-.19]} size={[1.45,.8,.045]} finish="black" />
         <Vase at={[.74,.51,0]} /><Plant at={[-.76,.51,0]} scale={.5} />
@@ -70,7 +70,7 @@ export function RoomContents({ room, onSelect }: {room:RoomId;active:string|null
       <Vase at={[-.35,.403,.25]} scale={.55} color="#6c7168" /><Plant at={[-1.8,0,-1.6]} scale={1.4} />
     </>}
     {room==='comedor' && <>
-      <Escanor position={[-.7,0,-1.7]} onSelect={onSelect} />
+      <Escanor position={[-.7,0,-1.7]} />
       <Contact at={[-.7,.006,-1.7]} size={[1.6,.6]} />
       <Vase at={[-.28,1.005,-1.65]} scale={.8} /><Plant at={[-1.15,1.005,-1.65]} scale={.45} />
       <Panel at={[.4,.77,.4]} size={[1.7,.045,.9]} finish="darkWood" />
@@ -87,7 +87,7 @@ export function RoomContents({ room, onSelect }: {room:RoomId;active:string|null
         {[-.35,.35].map(x=><Cushion key={x} at={[x,.58,-.55]} size={[.56,.12,.4]} color="#ede8dd" />)}
       </group>
       <Contact at={[.75,.006,-1.65]} size={[2.6,.85]} />
-      <Runa position={[.75,0,-1.65]} onSelect={onSelect} />
+      <Runa position={[.75,0,-1.65]} />
       <Panel at={[-2,.31,-.65]} size={[.4,.6,.4]} finish="darkWood" /><Vase at={[-2,.62,-.65]} scale={.7} />
       <Plant at={[2.15,0,.9]} scale={1.3} />
     </>}

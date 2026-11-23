@@ -6,9 +6,9 @@ import { ShowroomScene } from './ShowroomScene'
 
 export interface ShowroomProps {
   room: RoomId
-  pan: boolean
   active: string | null
-  onSelect: (name: string | null) => void
+  onSelect: (name: string) => void
+  pan: boolean
   running: boolean
   rotate: boolean
   reset: number
@@ -21,7 +21,6 @@ export default function Showroom3D(props: ShowroomProps) {
   return (
     <Canvas camera={{ position: [5.2, 3.8, 6.8], fov: 38 }} dpr={[1, 1.5]}
       frameloop={!props.running ? 'never' : props.rotate && !reduced ? 'always' : 'demand'}
-      onPointerMissed={event => { if (event.button === 0) props.onSelect(null) }}
       onCreated={({gl})=>{gl.shadowMap.type=PCFSoftShadowMap;gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.1;gl.domElement.addEventListener('webglcontextlost', props.onUnavailable, { once: true })}}
       gl={{ alpha: true, antialias: true }} shadows fallback={<p className="showroom__loading">Puedes explorar las fotografías y medidas en el catálogo.</p>}>
       <ShowroomScene {...props} />
