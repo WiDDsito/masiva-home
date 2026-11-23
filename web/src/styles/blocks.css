@@ -164,12 +164,10 @@
 .hero__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(25, 24, 23, 0.2) 0%,
-    rgba(25, 24, 23, 0.04) 38%,
-    rgba(25, 24, 23, 0.66) 100%
-  );
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(25 24 23 / .52), rgb(25 24 23 / .32) 32%, rgb(25 24 23 / .12) 60%, transparent 88%),
+    linear-gradient(180deg, transparent 48%, rgb(25 24 23 / .56));
 }
 
 .hero__inner {
@@ -181,7 +179,11 @@
 }
 
 @media (max-width: 640px) {
- .hero__scrim { background: linear-gradient(90deg, color-mix(in srgb, var(--color-charcoal) 72%, transparent), color-mix(in srgb, var(--color-charcoal) 65%, transparent) 96%, color-mix(in srgb, var(--color-charcoal) 35%, transparent)); }
+ .hero__scrim {
+   background:
+     linear-gradient(90deg, rgb(25 24 23 / .72), rgb(25 24 23 / .55) 40%, rgb(25 24 23 / .32) 72%, rgb(25 24 23 / .14)),
+     linear-gradient(180deg, transparent 32%, rgb(25 24 23 / .42));
+ }
  .hero__video { object-position: 58% center; }
  .hero .hero__lead, .hero .hero__cota, .hero .claim { color: var(--color-ivory); }
 }

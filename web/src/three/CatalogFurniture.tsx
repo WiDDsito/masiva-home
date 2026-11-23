@@ -64,6 +64,34 @@ export function Escanor({ position }: FurnitureProps) {
     <Panel at={[.215,.245,.178]} size={[.0015,.48,.001]} finish="gray" />
   </group>
 }
+/** Irene: 180 × 75 × 90 cm, wood inset with a black tubular frame. */
+export function DiningIrene({ position }: FurnitureProps) {
+  return <group position={position}>
+    <Panel at={[0, .737, 0]} size={[1.72, .026, .82]} />
+    {[-.428, .428].map(z => <Panel key={z} at={[0, .718, z]} size={[1.76, .045, .032]} finish="black" />)}
+    {[-.875, .875].map(x => <Panel key={x} at={[x, .718, 0]} size={[.032, .045, .85]} finish="black" />)}
+    {[-.878, .878].flatMap(x => [-.428, .428].map(z => (
+      <mesh key={x + ':' + z} position={[x, .375, z]} castShadow receiveShadow>
+        <cylinderGeometry args={[.022, .022, .75, 16]} />
+        <meshStandardMaterial color="#242422" roughness={.46} metalness={.45} />
+      </mesh>
+    )))}
+  </group>
+}
+
+/** Alferez: 165 × 90 × 205 cm, black plinth and three wood headboard panels. */
+export function Alferez({ position }: FurnitureProps) {
+  return <group position={position}>
+    <Panel at={[0, .035, 0]} size={[1.59, .07, 1.99]} finish="black" />
+    <Panel at={[0, .155, 0]} size={[1.56, .17, 1.96]} finish="black" />
+    <Panel at={[0, .205, .995]} size={[1.65, .27, .06]} />
+    {[-.795, .795].map(x => <Panel key={x} at={[x, .205, 0]} size={[.06, .27, 1.93]} />)}
+    <Panel at={[0, .485, -.995]} size={[1.65, .83, .06]} finish="black" />
+    <Panel at={[-.497, .735, -.955]} size={[.65, .33, .04]} />
+    {[.653, .823].map(y => <Panel key={y} at={[.333, y, -.955]} size={[.984, .154, .04]} />)}
+  </group>
+}
+
 /** Runa: 230 × 220 × 50 cm; six fronts, central wood slats and long side handles. */
 export function Runa({ position }: FurnitureProps) {
   return <group position={position}>

@@ -1,16 +1,21 @@
-/* Native document scrolling gives tall sections room to scroll between snap points. */
+/* The sticky header, anchors and snap points share the same offset. */
 :root:has(.home-page) {
-  scroll-padding-block-start: var(--header-h);
+  --home-header-size: calc(var(--header-h) + 1px);
+  scroll-padding-block-start: var(--home-header-size);
   scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
+}
+
+:root:has(.home-page) .site-header .header__inner {
+  min-height: var(--header-h);
 }
 
 .home-page > :is(#inicio, #tienda, #showroom, #servicios, #contacto) {
-  scroll-margin-block-start: 0;
+  min-block-size: calc(100dvh - var(--home-header-size));
   scroll-snap-align: start;
 }
 
 .home-page > :is(#tienda, #showroom, #contacto) {
-  min-block-size: calc(100svh - var(--header-h));
   display: grid;
   align-content: center;
   padding-block: clamp(2rem, 3.5vw, 3.25rem);
@@ -57,8 +62,8 @@
 .home-page .showroom__toolbar { padding: 0; justify-content: center; gap: .25rem 1rem; }
 .home-page .showroom__tools { justify-content: center; gap: 0 .375rem; }
 .home-page .showroom__toolbar button { padding-inline: .625rem; }
-.showroom__fallback-links { display: flex; justify-content: center; flex-wrap: wrap; gap: .25rem 1rem; }
-.showroom__fallback-links button { min-height: 44px; color: inherit; cursor: pointer; }
+.showroom__fallback-links { position: relative; z-index: 8; display: flex; justify-content: center; flex-wrap: wrap; gap: .25rem 1rem; pointer-events: none; }
+.showroom__fallback-links button { min-height: 44px; color: inherit; cursor: pointer; pointer-events: auto; }
 .showroom__fallback {
   display: grid;
   height: 100%;
@@ -136,6 +141,10 @@
 .contact__retail-link--plaza-vea { background: #ff0800; }
 .contact__retail-link img { width: 100%; height: 100%; min-width: 0; min-height: 0; object-fit: contain; }
 
+@media (max-width: 768px) {
+  .home-page > #showroom { align-content: start; }
+}
+
 @media (max-width: 640px) {
   .home-page .contact__grid { grid-template-columns: 1fr; }
   .contact__fields { grid-template-columns: 1fr; }
@@ -144,5 +153,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root:has(.home-page) { scroll-snap-type: none; }
+  :root:has(.home-page) {
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+  }
 }

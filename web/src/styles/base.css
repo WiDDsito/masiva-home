@@ -10,7 +10,6 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  /* El desplazamiento suave lo aporta Lenis; los anclas usan su scrollTo. */
   scroll-behavior: auto;
   /* Reserva el espacio del scrollbar en ambos temas para que alternar
      modo claro/oscuro no desplace el contenido. */

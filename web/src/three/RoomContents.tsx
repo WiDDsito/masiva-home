@@ -1,6 +1,8 @@
 import { RoundedBox } from '@react-three/drei'
+import type { ReactNode } from 'react'
+import type { ShowroomProps } from './Showroom3D'
 import type { RoomId } from '../content/showroom'
-import { Fabela, Kevin, Escanor, Runa, Panel } from './CatalogFurniture'
+import { Alferez, DiningIrene, Escanor, Fabela, Kevin, Panel, Runa } from './CatalogFurniture'
 import { Fabric, Contact, Wood } from './StudioMaterials'
 
 function Cushion({ at, size, color = '#d7cdbf' }: { at:[number,number,number]; size:[number,number,number]; color?:string }) {
@@ -47,7 +49,20 @@ function Architecture({ room }: {room:RoomId}) {
     <group position={[-.6,1.8,-1.98]}><Panel at={[0,0,0]} size={[1.15,.75,.025]} finish="darkWood" /><mesh position-z={.018}><planeGeometry args={[1.08,.68]} /><meshStandardMaterial color="#ded9cf" roughness={1} /></mesh><mesh position={[-.18,0,.025]}><circleGeometry args={[.21,32]} /><meshStandardMaterial color="#a59176" roughness={1} /></mesh><mesh position={[.22,-.1,.025]}><planeGeometry args={[.26,.35]} /><meshStandardMaterial color="#6b7774" roughness={1} /></mesh></group>
   </>
 }
-export function RoomContents({ room }: { room: RoomId }) {
+type ProductSelectHandler = ShowroomProps['onSelect']
+
+function SelectableProduct({ id, onSelect, children }: { id: string; onSelect?: ProductSelectHandler; children: ReactNode }) {
+  if (!onSelect) return <>{children}</>
+
+  return <group onClick={event => {
+    event.stopPropagation()
+    if (event.button === 0 && event.delta <= 4) onSelect(id)
+  }}>
+    {children}
+  </group>
+}
+
+export function RoomContents({ room, onProductSelect }: { room: RoomId; onProductSelect?: ProductSelectHandler }) {
   return <>
     <Architecture room={room} />
     {room==='sala' && <>
@@ -60,9 +75,13 @@ export function RoomContents({ room }: { room: RoomId }) {
       </group>
       <mesh position={[0,.003,.1]} rotation-x={-Math.PI/2} receiveShadow><planeGeometry args={[3.1,2.7]} /><Fabric color="#c2b9a9" /></mesh>
       <Contact at={[-.3,.008,.3]} size={[1.5,.95]} />
-      <Fabela position={[-.3,0,.3]} />
+      <SelectableProduct id="fabela" onSelect={onProductSelect}>
+        <Fabela position={[-.3,0,.3]} />
+      </SelectableProduct>
       <group position={[.9,0,-1.7]}>
-        <Kevin position={[0,0,0]} />
+        <SelectableProduct id="kevin" onSelect={onProductSelect}>
+          <Kevin position={[0,0,0]} />
+        </SelectableProduct>
         
         <Panel at={[0,1.18,-.19]} size={[1.45,.8,.045]} finish="black" />
         <Vase at={[.74,.51,0]} /><Plant at={[-.76,.51,0]} scale={.5} />
@@ -70,24 +89,35 @@ export function RoomContents({ room }: { room: RoomId }) {
       <Vase at={[-.35,.403,.25]} scale={.55} color="#6c7168" /><Plant at={[-1.8,0,-1.6]} scale={1.4} />
     </>}
     {room==='comedor' && <>
-      <Escanor position={[-.7,0,-1.7]} />
+      <SelectableProduct id="escanor" onSelect={onProductSelect}>
+        <Escanor position={[-.7,0,-1.7]} />
+      </SelectableProduct>
       <Contact at={[-.7,.006,-1.7]} size={[1.6,.6]} />
       <Vase at={[-.28,1.005,-1.65]} scale={.8} /><Plant at={[-1.15,1.005,-1.65]} scale={.45} />
-      <Panel at={[.4,.77,.4]} size={[1.7,.045,.9]} finish="darkWood" />
-      {[-.3,1.1].flatMap(x=>[.08,.73].map(z=><Panel key={`${x}-${z}`} at={[x,.37,z]} size={[.06,.74,.06]} finish="darkWood" />))}
-      {[-.1,.9].flatMap(x=>[-.35,1.15].map(z=><Chair key={`${x}-${z}`} x={x} z={z} turn={z<0?Math.PI:0} />))}
-      <Vase at={[.4,.8,.4]} scale={.9} color="#c1b29a" />
+      <group position={[.4, 0, .4]}>
+        <SelectableProduct id="irene-comedor" onSelect={onProductSelect}>
+          <DiningIrene position={[0, 0, 0]} />
+        </SelectableProduct>
+        {[-.5, .5].map(x => <group key={x}>
+          <Chair x={x} z={-.75} />
+          <Chair x={x} z={.75} turn={Math.PI} />
+        </group>)}
+        <Vase at={[-.35, .75, -.1]} scale={.75} color="#c1b29a" />
+      </group>
     </>}
     {room==='dormitorio' && <>
       <group position={[-1,0,.2]}>
-        <Panel at={[0,.2,0]} size={[1.4,.3,1.95]} finish="darkWood" />
-        <Cushion at={[0,.42,0]} size={[1.38,.22,1.9]} color="#f3eee3" />
-        <Cushion at={[0,.65,-1]} size={[1.5,1.05,.1]} color="#c5b49b" />
-        <Cushion at={[0,.55,.4]} size={[1.39,.05,1.1]} color="#a4afa9" />
-        {[-.35,.35].map(x=><Cushion key={x} at={[x,.58,-.55]} size={[.56,.12,.4]} color="#ede8dd" />)}
+        <SelectableProduct id="alferez" onSelect={onProductSelect}>
+          <Alferez position={[0, 0, 0]} />
+          <Cushion at={[0, .365, .02]} size={[1.51, .22, 1.86]} color="#ebe5da" />
+          <Cushion at={[0, .48, .39]} size={[1.52, .055, 1.08]} color="#666b64" />
+          {[-.35, .35].map(x => <Cushion key={x} at={[x, .52, -.55]} size={[.58, .12, .39]} color="#ede8dd" />)}
+        </SelectableProduct>
       </group>
       <Contact at={[.75,.006,-1.65]} size={[2.6,.85]} />
-      <Runa position={[.75,0,-1.65]} />
+      <SelectableProduct id="runa" onSelect={onProductSelect}>
+        <Runa position={[.75,0,-1.65]} />
+      </SelectableProduct>
       <Panel at={[-2,.31,-.65]} size={[.4,.6,.4]} finish="darkWood" /><Vase at={[-2,.62,-.65]} scale={.7} />
       <Plant at={[2.15,0,.9]} scale={1.3} />
     </>}

@@ -19,6 +19,8 @@ export const images = {
   yoshi: localImages.get('escritorios/ect-yoshi.webp'),
   fabela: localImages.get('mesas-de-centro/mdc-fabela.webp'),
   irene: localImages.get('mesas-de-centro/mdc-irene.webp'),
+  diningIrene: localImages.get('mesas-de-comedor/mdc-irene-hover.jpg'),
+  bedAlferez: localImages.get('soporte-de-cama/sdc-alferez-hover.jpg'),
   kevin: localImages.get('mesas-de-tv/mdtv-kevin.webp'),
   runa: localImages.get('roperos/rp-runa.webp'),
   aira: localImages.get('aparadores/aira/aira.webp'),

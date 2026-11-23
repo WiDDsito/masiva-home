@@ -72,8 +72,8 @@ export function App() {
         if (!window.location.hash.includes('buscar')) document.getElementById('contenido')?.focus({ preventScroll: true })
       } else {
         const destination = window.location.hash.slice(1)
-        if (!destination || destination === 'inicio') window.scrollTo(0, 0)
-        else document.getElementById(destination)?.scrollIntoView({ behavior: 'instant' })
+        if (!destination) window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+        else document.getElementById(destination)?.scrollIntoView({ block: 'start' })
       }
     })
     return () => cancelAnimationFrame(frame)

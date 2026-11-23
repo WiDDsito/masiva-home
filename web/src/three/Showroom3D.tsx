@@ -7,7 +7,7 @@ import { ShowroomScene } from './ShowroomScene'
 export interface ShowroomProps {
   room: RoomId
   active: string | null
-  onSelect: (name: string) => void
+  onSelect: (productId: string) => void
   pan: boolean
   running: boolean
   rotate: boolean

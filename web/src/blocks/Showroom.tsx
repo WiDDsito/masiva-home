@@ -29,12 +29,27 @@ export function Showroom() {
   const [reset, setReset] = useState(0)
   const stage = useRef<HTMLDivElement>(null)
   const { ref, visible } = useInView<HTMLElement>('300px')
-  const showFallback = useCallback(() => { setUnavailable(true); setRotate(false); setPan(false) }, [])
+  const showFallback = useCallback(() => {
+    setUnavailable(true)
+    setRotate(false)
+    setPan(false)
+  }, [])
   const visiblePieces = showroomPieces.filter(piece => piece.room === room)
-  const selected = visiblePieces.find(piece => piece.name === active)
-  const selectPiece = (name: string) => { setActive(current => current === name ? null : name); setRotate(false) }
+  const selected = visiblePieces.find(piece => piece.productId === active)
+  const selectPiece = (productId: string) => {
+    setActive(current => current === productId ? null : productId)
+    setRotate(false)
+  }
+  const closeProduct = () => {
+    const marker = stage.current?.querySelector<HTMLButtonElement>(`[data-product-id="${selected?.productId}"]`)
+    setActive(null)
+    marker?.focus({ preventScroll: true })
+  }
   const selectRoom = (id: RoomId) => { setRoom(id); setActive(null); setZoom(1) }
   const selectedProduct = products.find(product => product.id === selected?.productId)
+  const selectedName = selectedProduct?.name ?? selected?.name
+  const selectedImage = selected?.preview?.image ?? selectedProduct?.image
+  const selectedSpecs = selected?.preview?.specs ?? (selectedProduct && `${selectedProduct.dimensions} · ${selectedProduct.color}`)
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => setInViewport(entry.isIntersecting))
@@ -47,9 +62,7 @@ export function Showroom() {
   return (
     <section ref={ref} className="showroom on-dark" id="showroom" aria-labelledby="showroom-title" onKeyDown={event => {
       if (event.key !== 'Escape' || !selected) return
-      const marker = stage.current?.querySelector<HTMLButtonElement>(`[data-product-id="${selected.productId}"]`)
-      setActive(null)
-      marker?.focus({ preventScroll: true })
+      closeProduct()
     }}>
       <div className="container">
         <div className="showroom__intro">
@@ -68,6 +81,7 @@ export function Showroom() {
           </div>
           <div className="showroom__toolbar">
             {!unavailable && <div className="showroom__tools">
+              <button type="button" onClick={() => setActive(null)}>Vista general</button>
               <button type="button" aria-pressed={rotate} onClick={() => setRotate(value => !value)}>{rotate ? 'Pausar giro' : 'Giro automático'}</button>
               <button type="button" aria-pressed={pan} onClick={() => setPan(value => !value)}>Desplazar</button>
               <button type="button" aria-label="Acercar ambiente" disabled={zoom >= 1.8} onClick={() => setZoom(value => Math.min(1.8, value + .2))}>+</button>
@@ -79,7 +93,7 @@ export function Showroom() {
         </div>
       </div>
       <div
-        className={selected ? 'showroom__layout showroom__layout--selected' : 'showroom__layout'}
+        className="showroom__layout"
         id="room-viewport"
         role="tabpanel"
         aria-labelledby={`room-tab-${room}`}
@@ -91,7 +105,7 @@ export function Showroom() {
             <p role="status">La vista 3D no está disponible en este dispositivo.</p>
             <div className="showroom__fallback-links">
               {visiblePieces.map(piece => (
-                <button className="link" type="button" key={piece.productId} data-product-id={piece.productId} aria-pressed={active === piece.name} aria-controls={active === piece.name ? 'showroom-product' : undefined} onClick={() => selectPiece(piece.name)}>
+                <button className="link" type="button" key={piece.productId} data-product-id={piece.productId} aria-pressed={active === piece.productId} aria-controls={active === piece.productId ? 'showroom-product' : undefined} onClick={() => selectPiece(piece.productId)}>
                   {products.find(product => product.id === piece.productId)?.name ?? piece.name}
                 </button>
               ))}
@@ -99,13 +113,20 @@ export function Showroom() {
           </div> : visible && <ShowroomBoundary onUnavailable={showFallback}><Suspense fallback={<span className="showroom__loading" role="status">Preparando el showroom…</span>}>
             <Showroom3D room={room} active={active} onSelect={selectPiece} pan={pan} running={inViewport && pageVisible} rotate={rotate} reset={reset} zoom={zoom} onUnavailable={showFallback} />
           </Suspense></ShowroomBoundary>}
-          {!unavailable && !active && <p className="showroom__hint">Arrastra para girar el ambiente o pulsa + para explorar un mueble.</p>}
+          {!unavailable && <>
+            <div className="showroom__room-copy" aria-hidden={Boolean(selected)}>
+              <h3><span>Un espacio para</span>{' '}{rooms[room].titleEnding}</h3>
+              <p>Selecciona un mueble para acercarte. Vuelve a pulsarlo o elige Vista general para regresar.</p>
+            </div>
+            {!selected && <p className="showroom__hint">Pulsa + para explorar un mueble · Arrastra para girar</p>}
+          </>}
         </div>
-        {selected && <article id="showroom-product" className="showroom__product-card" aria-labelledby="showroom-product-title">
-          {selectedProduct?.image && <img src={selectedProduct.image} alt={selectedProduct.name} width="88" height="88" decoding="async" />}
-          <h3 id="showroom-product-title">{selectedProduct?.name ?? selected.name}</h3>
+        {selected && <article key={selected.productId} id="showroom-product" className="showroom__product-card" aria-labelledby="showroom-product-title">
+          <button className="showroom__product-close" type="button" aria-label="Cerrar tarjeta del producto" onClick={closeProduct}>×</button>
+          {selectedImage && <img src={selectedImage} alt={selectedName} width="88" height="88" decoding="async" />}
+          <h3 id="showroom-product-title">{selectedName}</h3>
           <p>{selected.detail}</p>
-          {selectedProduct && <p className="showroom__product-specs">{selectedProduct.dimensions} · {selectedProduct.color}</p>}
+          {selectedSpecs && <p className="showroom__product-specs">{selectedSpecs}</p>}
           <p className="showroom__product-price">Ver precio en el catálogo</p>
           <a className="btn btn--primary" href={showroomCatalogHref(selected)}>Buscar en el catálogo</a>
         </article>}
