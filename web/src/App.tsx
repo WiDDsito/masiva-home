@@ -1,13 +1,14 @@
 import { transitionView } from './lib/viewTransition'
 import { useEffect, useRef, useState } from 'react'
 import { Catalog } from './blocks/Catalog'
+import { Checkout } from './blocks/Checkout'
 import './styles/home.css'
 import { WooProductDetails } from './blocks/WooProductDetails'
 import { CartProvider } from './lib/CartContext'
 import { Cart } from './components/Cart'
 import { Contact } from './blocks/Contact'
 import { Footer } from './blocks/Footer'
-import { Header } from './blocks/Header'
+import { CheckoutHeader, Header } from './blocks/Header'
 import { Help } from './blocks/Help'
 import { Hero } from './blocks/Hero'
 import { Services } from './blocks/Services'
@@ -21,6 +22,7 @@ function isCatalogHash(hash: string) {
 function pageFor(hash: string) {
   if (isCatalogHash(hash)) return 'catalog'
   if (hash.startsWith('#producto/')) return 'product'
+  if (hash === '#finalizar-compra') return 'checkout'
   return hash === '#ayuda' || hash.startsWith('#ayuda?') ? 'help' : 'home'
 }
 
@@ -62,9 +64,9 @@ export function App() {
   }, [page])
 
   useEffect(() => {
-    document.title = isCatalog ? 'Catálogo completo | Masiva Home' : page === 'product' ? 'Ficha del producto | Masiva Home' : page === 'help' ? 'Ayuda para tu compra | Masiva Home' : 'Masiva Home — Muebles que transforman tu hogar'
+    document.title = page === 'checkout' ? 'Finalizar compra | Masiva Home' : isCatalog ? 'Catálogo completo | Masiva Home' : page === 'product' ? 'Ficha del producto | Masiva Home' : page === 'help' ? 'Ayuda para tu compra | Masiva Home' : 'Masiva Home — Muebles que transforman tu hogar'
     const frame = requestAnimationFrame(() => {
-      if (page === 'help' || page === 'product') {
+      if (page === 'help' || page === 'product' || page === 'checkout') {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
         document.getElementById('contenido')?.focus({ preventScroll: true })
       } else if (isCatalog) {
@@ -81,11 +83,14 @@ export function App() {
 
   return (
     <CartProvider>
-      <a className="skip-link" href="#contenido">
+      <a className="skip-link" href="#contenido" onClick={page === 'checkout' ? event => {
+        event.preventDefault()
+        document.getElementById('contenido')?.focus()
+      } : undefined}>
         Saltar al contenido
       </a>
 
-      <Header onSearchNavigate={() => {
+      {page === 'checkout' ? <CheckoutHeader /> : <Header onSearchNavigate={() => {
         const search = document.querySelector<HTMLInputElement>('#catalog-search')
         if (search) {
           search.focus({ preventScroll: true })
@@ -97,7 +102,7 @@ export function App() {
       }} onCatalogNavigate={id => {
         catalogTransition.current = id === 'all' ? 'showroom-catalog' : undefined
         window.location.hash = id === 'all' ? '#catalogo' : `#catalogo?categoria=${id}`
-      }} />
+      }} />}
 
       <main id="contenido" tabIndex={-1} className={page === 'home' ? 'page-view home-page' : 'page-view'} onClickCapture={event => {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
@@ -108,7 +113,7 @@ export function App() {
           <Catalog key={params.category} focusSearch={params.focusSearch} initialCategory={params.category} />
         ) : page === 'product' ? (
           <WooProductDetails key={productId} id={wooProductId} catalogHref={catalogHref} />
-        ) : page === 'help' ? <Help topic={helpTopic} /> : (
+        ) : page === 'checkout' ? <Checkout /> : page === 'help' ? <Help topic={helpTopic} /> : (
           <>
             <Hero />
             <Shop />

@@ -23,6 +23,22 @@ function BagIcon() {
   )
 }
 
+export function CheckoutHeader() {
+  const { count, open, setOpen } = useCart()
+  return (
+    <header className="site-header checkout-header">
+      <div className="container checkout-header__inner">
+        <a className="brand" href="#inicio" aria-label="Masiva Home, ir al inicio">Masiva Home</a>
+        <button className="icon-btn" type="button" aria-label={`Carrito, ${count} productos`}
+          aria-haspopup="dialog" aria-expanded={open} aria-controls="shopping-bag" onClick={() => setOpen(true)}>
+          <BagIcon />
+          <span className="cart-count" aria-hidden="true">{count}</span>
+        </button>
+      </div>
+    </header>
+  )
+}
+
 function ChevronIcon({ open }: { open: boolean }) {
   return (
     <svg

@@ -12,6 +12,7 @@
     "check:motion": "node scripts/motion-check.mjs",
     "check:layout": "node scripts/layout-check.mjs",
     "check:cart": "node scripts/cart-check.mjs",
+    "check:checkout": "node scripts/checkout-check.mjs",
     "check:showroom": "node scripts/showroom-check.mjs",
     "check:experience": "node scripts/experience-check.mjs",
     "check:catalog-view": "node scripts/catalog-view-check.mjs",

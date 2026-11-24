@@ -68,6 +68,12 @@ export function Cart() {
             <p>{formatWooCartMoney(item.totals.line_total, item.totals)}</p>
           </div>
         </li>)}</ul>
+        <div className="cart-checkout-action">
+          <Button block onClick={() => {
+            setOpen(false)
+            window.location.hash = '#finalizar-compra'
+          }}>Finalizar compra</Button>
+        </div>
         {items.length > 0 && <div className="cart-summary"><p>{wooItems.length ? 'Subtotal de la selección local' : 'Subtotal'} <strong>{formatPEN(total)}</strong></p><p>Entrega y disponibilidad por confirmar.</p><Button block href={whatsapp} external>Consultar mi selección por WhatsApp</Button><p>Vista local. El pago en línea se habilitará al conectar el checkout de la tienda.</p></div>}
         {wooCart && wooItems.length > 0 && <div className="cart-summary">
           <p>Subtotal simulado <strong>{formatWooCartMoney(wooCart.totals.total_items, wooCart.totals)}</strong></p>
