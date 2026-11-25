@@ -1,4 +1,5 @@
-export const wooAddItemEndpoint = '/wp-json/wc/store/v1/cart/add-item'
+export const wooCartEndpoint = '/wp-json/wc/store/v1/cart'
+export const wooAddItemEndpoint = `${wooCartEndpoint}/add-item`
 
 export interface WooCartAttribute { attribute: string; value: string }
 export interface WooAddItem {
@@ -27,6 +28,17 @@ export interface WooCartSnapshot {
   items: WooCartItem[]
   items_count: number
   totals: Currency & { total_items: string; total_price: string }
+}
+
+export async function readWooCartResponse(response: Response): Promise<WooCartSnapshot> {
+  const data = await response.json().catch(() => null)
+  if (!response.ok) {
+    throw new Error(typeof data?.message === 'string' ? data.message : 'No pudimos actualizar el carrito.')
+  }
+  if (!Array.isArray(data?.items) || !Number.isSafeInteger(data.items_count) || !data.totals) {
+    throw new Error('WooCommerce devolvió un carrito inválido.')
+  }
+  return { items: data.items, items_count: data.items_count, totals: data.totals }
 }
 
 export interface WooPurchaseSource {

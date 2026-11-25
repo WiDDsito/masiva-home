@@ -24,6 +24,7 @@ function BagIcon() {
 }
 
 export function CheckoutHeader() {
+  useTheme()
   const { count, open, setOpen } = useCart()
   return (
     <header className="site-header checkout-header">

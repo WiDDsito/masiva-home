@@ -3,13 +3,15 @@ import type { ReactNode } from 'react'
 import { products } from '../content/demo'
 import { cartReducer, restoreCart } from './cart'
 import type { CartAction, CartFeedback, CartLine, CartState } from './cart'
-import { wooAddItemEndpoint } from './wooCart'
+import { readWooCartResponse, wooAddItemEndpoint, wooCartEndpoint } from './wooCart'
+import { wordpressCommerce } from './wordpressCommerce'
 import type { WooAddItem, WooCartSnapshot } from './wooCart'
 
 interface CartActions {
   setQuantity: (id: string, quantity: number) => void
   add: (id: string) => void
   addWooItem: (item: WooAddItem) => Promise<void>
+  refreshWooCart: () => void
   setOpen: (open: boolean) => void
   dismissNotice: (id: number) => void
 }
@@ -17,6 +19,8 @@ interface CartContextValue extends CartActions {
   lines: CartLine[]
   wooCart: WooCartSnapshot | null
   wooPending: boolean
+  wooCheckoutUrl?: string
+  wooCartStatus: 'loading' | 'ready' | 'error'
   open: boolean
   count: number
   notice: CartFeedback | null
@@ -36,10 +40,47 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const current = useRef(state)
   const persistent = useRef(true)
   const [open, setOpen] = useState(false)
+  const [commerce] = useState(wordpressCommerce)
+  const [wooCartStatus, setWooCartStatus] = useState<CartContextValue['wooCartStatus']>(
+    commerce ? 'loading' : 'ready',
+  )
   const [wooCart, setWooCart] = useState<WooCartSnapshot | null>(null)
   const [wooPending, setWooPending] = useState(false)
   const wooInFlight = useRef(false)
   const wooToken = useRef<string | null>(null)
+  const wooRead = useRef<AbortController>()
+  const wooRestHeaders = useMemo(() => {
+    const headers: Record<string, string> = {}
+    if (commerce?.restNonce) headers['X-WP-Nonce'] = commerce.restNonce
+    return headers
+  }, [commerce])
+
+  const refreshWooCart = useCallback(() => {
+    if (!commerce || wooInFlight.current) return
+    wooRead.current?.abort()
+    const request = new AbortController()
+    wooRead.current = request
+    setWooCartStatus('loading')
+    void fetch(wooCartEndpoint, {
+      signal: request.signal, credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: wooRestHeaders,
+    }).then(readWooCartResponse).then(cart => {
+      if (request.signal.aborted) return
+      setWooCart(cart)
+      setWooCartStatus('ready')
+    }).catch(() => {
+      if (!request.signal.aborted) setWooCartStatus('error')
+    })
+  }, [commerce, wooRestHeaders])
+
+  useEffect(() => {
+    refreshWooCart()
+    const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) refreshWooCart() }
+    window.addEventListener('pageshow', onPageShow)
+    return () => {
+      wooRead.current?.abort()
+      window.removeEventListener('pageshow', onPageShow)
+    }
+  }, [refreshWooCart])
   const publish = useCallback((next: CartState) => { current.current = next; setState(next) }, [])
   useEffect(() => {
     const refresh = () => {
@@ -74,35 +115,52 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (product) mutate({ type: 'add', product })
   }, [mutate])
   const addWooItem = useCallback(async (item: WooAddItem) => {
-    if (!import.meta.env.DEV || wooInFlight.current) return
+    if ((!commerce && !import.meta.env.DEV) || wooInFlight.current) return
     wooInFlight.current = true
+    wooRead.current?.abort()
     setWooPending(true)
     try {
-      wooToken.current ??= crypto.randomUUID()
+      const headers: Record<string, string> = { 'Content-Type': 'application/json', ...wooRestHeaders }
+      if (commerce) {
+        const current = await fetch(wooCartEndpoint, {
+          credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: wooRestHeaders,
+        })
+        const cart = await readWooCartResponse(current)
+        setWooCart(cart)
+        setWooCartStatus('ready')
+        const nonce = current.headers.get('Nonce')
+        if (!nonce) throw new Error('No pudimos iniciar la sesión del carrito. Vuelve a intentarlo.')
+        headers.Nonce = nonce
+      } else {
+        wooToken.current ??= crypto.randomUUID()
+        headers['Cart-Token'] = wooToken.current
+      }
+
       const response = await fetch(wooAddItemEndpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Cart-Token': wooToken.current },
-        credentials: 'omit',
+        headers,
+        credentials: commerce ? 'same-origin' : 'omit',
+        redirect: 'error',
         body: JSON.stringify(item),
       })
-      const data = await response.json().catch(() => null)
-      if (!response.ok) {
-        throw new Error(typeof data?.message === 'string' ? data.message : 'No pudimos añadir el producto al carrito simulado.')
-      }
-      if (!Array.isArray(data?.items) || !Number.isSafeInteger(data.items_count) || !data.totals) {
-        throw new Error('El carrito simulado devolvió una respuesta inválida.')
-      }
-      setWooCart(data)
+      const cart = await readWooCartResponse(response)
+      setWooCart(cart)
       setOpen(true)
+    } catch (error) {
+      if (commerce) setWooCartStatus(status => status === 'loading' ? 'error' : status)
+      throw error
     } finally {
       wooInFlight.current = false
       setWooPending(false)
     }
-  }, [])
+  }, [commerce, wooRestHeaders])
   const dismissNotice = useCallback((id: number) => publish(cartReducer(current.current, { type: 'dismiss', id })), [publish])
-  const actions = useMemo(() => ({ add, addWooItem, setQuantity, setOpen, dismissNotice }), [add, addWooItem, setQuantity, setOpen, dismissNotice])
+  const actions = useMemo(() => ({ add, addWooItem, refreshWooCart, setQuantity, setOpen, dismissNotice }), [add, addWooItem, refreshWooCart, setQuantity, setOpen, dismissNotice])
   const count = state.lines.reduce((total, line) => total + line.quantity, wooCart?.items_count ?? 0)
-  const value = useMemo(() => ({ ...actions, lines: state.lines, wooCart, wooPending, notice: state.feedback, open, count }), [actions, state.lines, state.feedback, wooCart, wooPending, open, count])
+  const value = useMemo(() => ({
+    ...actions, lines: state.lines, wooCart, wooPending, wooCartStatus,
+    wooCheckoutUrl: commerce?.checkoutUrl, notice: state.feedback, open, count,
+  }), [actions, state.lines, state.feedback, wooCart, wooPending, wooCartStatus, commerce, open, count])
   return <CartActionsContext.Provider value={actions}><CartContext.Provider value={value}>{children}</CartContext.Provider></CartActionsContext.Provider>
 }
 export function useCart() { const value = useContext(CartContext); if (!value) throw new Error('Falta CartProvider'); return value }

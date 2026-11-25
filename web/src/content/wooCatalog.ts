@@ -135,6 +135,16 @@ export async function loadWooProducts(query: string, signal: AbortSignal) {
   }
 }
 
+const featuredIds = [8392, 8404] // Aparadores Escanor y Emma, publicados en ambas tiendas.
+
+export async function loadWooFeaturedProducts(signal: AbortSignal) {
+  const query = new URLSearchParams({ include: featuredIds.join(','), orderby: 'include' })
+  const response = await fetch(`${productsEndpoint}?${query}`, { signal, credentials: 'omit' })
+  const products = await readCollection<WooProduct>(response)
+  return products.filter(product => featuredIds.includes(product.id) && purchaseRules(product).available
+    && productPrice(product) !== 'Precio no disponible').map(toCatalogCard)
+}
+
 function productPhotos(product: WooProduct) {
   return (product.images ?? []).flatMap(image => {
     const photo = catalogImage(image, product.name)

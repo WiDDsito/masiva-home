@@ -1,3 +1,8 @@
+/* WordPress themes may apply an explicit heading color to all descendants. */
+#root :is(.catalog-page, .products--preview, .checkout) :is(h1, h2, h3) {
+  color: var(--text);
+}
+
 /* Catalogue-only layout. Shared cards and the home sections keep their styles. */
 .catalog-page { padding: 2rem 0 4rem; }
 .catalog-page__breadcrumb { display: flex; gap: .75rem; color: var(--text-muted); font-size: .75rem; margin-bottom: 2rem; }

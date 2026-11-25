@@ -15,10 +15,15 @@ if (!rootElement) {
   throw new Error('No se encontró el contenedor #root')
 }
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// WordPress can load the entry with a version query while Vite's lazy
+// chunks import the same file without it. Mount once per storefront root.
+if (!rootElement.dataset.masivaMounted) {
+  rootElement.dataset.masivaMounted = 'true'
+  createRoot(rootElement).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
+}
 
 import './styles/experience.css'

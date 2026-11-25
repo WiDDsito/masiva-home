@@ -3,6 +3,7 @@ import { loadWooProduct, loadWooVariations } from '../content/wooCatalog'
 import { resolveWooVariation } from '../content/wooVariations'
 import type { VariationResolution } from '../content/wooVariations'
 import { Button } from '../components/Button'
+import { useCart } from '../lib/CartContext'
 import { ProductGallery } from '../components/ProductGallery'
 import { WooAddToCart } from '../components/WooAddToCart'
 import type { WooAddItem } from '../lib/wooCart'
@@ -67,6 +68,7 @@ interface Selection {
 const emptySelection: Selection = { values: new Map(), resolution: { status: 'incomplete' } }
 
 function WooProductContent({ product }: { product: Product }) {
+  const { wooCheckoutUrl } = useCart()
   const group = product.variationGroup
   const [variants, setVariants] = useState<VariantsState>({ status: 'loading' })
   const [variantAttempt, setVariantAttempt] = useState(0)
@@ -150,7 +152,7 @@ function WooProductContent({ product }: { product: Product }) {
               setPhoto(0)
             }}>Limpiar selección</Button>}
           </fieldset>)}
-        {import.meta.env.DEV && <WooAddToCart key={item?.id ?? product.id} item={item} purchase={displayed.purchase} />}
+        {(wooCheckoutUrl || import.meta.env.DEV) && <WooAddToCart key={item?.id ?? product.id} item={item} purchase={displayed.purchase} />}
       </div>
     </div>
   )

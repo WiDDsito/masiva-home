@@ -41,6 +41,10 @@ export function useTheme() {
     return () => query.removeEventListener('change', onChange)
   }, [manual])
 
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+  }, [theme])
+
   const toggle = () => {
     const next: Theme = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)

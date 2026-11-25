@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:wordpress": "tsc --noEmit && vite build --base=./",
     "preview": "vite preview",
     "shots": "node scripts/shots.mjs",
     "check:theme": "node scripts/theme-check.mjs",
@@ -13,6 +14,7 @@
     "check:layout": "node scripts/layout-check.mjs",
     "check:cart": "node scripts/cart-check.mjs",
     "check:checkout": "node scripts/checkout-check.mjs",
+    "check:wordpress-commerce": "node scripts/wordpress-commerce-check.mjs",
     "check:showroom": "node scripts/showroom-check.mjs",
     "check:experience": "node scripts/experience-check.mjs",
     "check:catalog-view": "node scripts/catalog-view-check.mjs",

@@ -7,7 +7,7 @@ import { formatPEN } from '../lib/format'
 import { formatWooCartMoney } from '../lib/wooCart'
 
 export function Cart() {
-  const { lines, wooCart, setQuantity, open, setOpen } = useCart()
+  const { lines, wooCart, wooCheckoutUrl, wooCartStatus, refreshWooCart, setQuantity, open, setOpen } = useCart()
   const dialog = useRef<HTMLDialogElement>(null)
   const closing = useRef(false)
   useEffect(() => {
@@ -52,6 +52,10 @@ export function Cart() {
     <CartNotice />
     <dialog ref={dialog} id="shopping-bag" className="cart-dialog" aria-labelledby="cart-title" onCancel={event => { event.preventDefault(); void requestClose() }} onClose={() => setOpen(false)} data-lenis-prevent>
       <div className="cart-dialog__head"><h2 id="cart-title">Tu carrito</h2><button className="icon-btn" type="button" autoFocus aria-label="Cerrar carrito" onClick={() => void requestClose()}>×</button></div>
+      {wooCartStatus === 'error' && <div className="cart-summary">
+        <p role="alert">No pudimos consultar tu carrito de WooCommerce.</p>
+        <Button variant="ghost" onClick={refreshWooCart}>Volver a intentar</Button>
+      </div>}
       {items.length || wooItems.length ? <>
         <ul className="cart-lines">{items.map(({ id, quantity, product }) => <li key={id}>
           {product.image ? <img src={product.image} alt="" width="80" height="90" /> : <span aria-hidden="true" />}
@@ -68,18 +72,19 @@ export function Cart() {
             <p>{formatWooCartMoney(item.totals.line_total, item.totals)}</p>
           </div>
         </li>)}</ul>
-        <div className="cart-checkout-action">
+        {(!wooCheckoutUrl || wooItems.length > 0) && <div className="cart-checkout-action">
           <Button block onClick={() => {
             setOpen(false)
             window.location.hash = '#finalizar-compra'
           }}>Finalizar compra</Button>
-        </div>
-        {items.length > 0 && <div className="cart-summary"><p>{wooItems.length ? 'Subtotal de la selección local' : 'Subtotal'} <strong>{formatPEN(total)}</strong></p><p>Entrega y disponibilidad por confirmar.</p><Button block href={whatsapp} external>Consultar mi selección por WhatsApp</Button><p>Vista local. El pago en línea se habilitará al conectar el checkout de la tienda.</p></div>}
-        {wooCart && wooItems.length > 0 && <div className="cart-summary">
-          <p>Subtotal simulado <strong>{formatWooCartMoney(wooCart.totals.total_items, wooCart.totals)}</strong></p>
-          <p>Total simulado <strong>{formatWooCartMoney(wooCart.totals.total_price, wooCart.totals)}</strong></p>
         </div>}
-      </> : <div className="cart-empty"><h3>Tu próximo mueble te espera.</h3><p>Explora el catálogo y guarda aquí tus favoritos para comprar.</p><Button onClick={() => void requestClose()}>Seguir explorando</Button></div>}
+        {items.length > 0 && <div className="cart-summary"><p>{wooItems.length ? 'Subtotal de la selección local' : 'Subtotal'} <strong>{formatPEN(total)}</strong></p><p>Entrega y disponibilidad por confirmar.</p><Button block href={whatsapp} external>Consultar mi selección por WhatsApp</Button><p>Esta selección se gestiona por WhatsApp.</p></div>}
+        {wooCart && wooItems.length > 0 && <div className="cart-summary">
+          <p>{wooCheckoutUrl ? 'Subtotal de WooCommerce' : 'Subtotal simulado'} <strong>{formatWooCartMoney(wooCart.totals.total_items, wooCart.totals)}</strong></p>
+          {!wooCheckoutUrl && <p>Total simulado <strong>{formatWooCartMoney(wooCart.totals.total_price, wooCart.totals)}</strong></p>}
+        </div>}
+      </> : wooCartStatus === 'loading' ? <p className="cart-summary" role="status">Cargando carrito…</p>
+        : wooCartStatus === 'error' ? null : <div className="cart-empty"><h3>Tu próximo mueble te espera.</h3><p>Explora el catálogo y guarda aquí tus favoritos para comprar.</p><Button onClick={() => void requestClose()}>Seguir explorando</Button></div>}
     </dialog>
   </>
 }

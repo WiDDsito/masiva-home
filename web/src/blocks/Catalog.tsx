@@ -175,6 +175,7 @@ export function Catalog({ focusSearch = false, initialCategory = 'all' }: { focu
         : result?.cards.length ? <div className="catalog-grid">{result.cards.map(({ id, ...card }) => <CatalogCardLayout
           key={id}
           {...card}
+          heading="h3"
           href={`#producto/${id}${catalogQuery}`}
         />)}</div>
         : <div className="catalog-page__empty">
