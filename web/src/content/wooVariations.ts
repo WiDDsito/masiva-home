@@ -18,7 +18,7 @@ interface VariationAxis {
 
 export interface VariationGroup {
   axes: VariationAxis[]
-  definitions: WooVariationDefinition[]
+  definitions: ReadonlyMap<number, WooVariationDefinition>
 }
 
 export function variationGroup(attributes: WooAttribute[], definitions: WooVariationDefinition[]): VariationGroup {
@@ -28,14 +28,14 @@ export function variationGroup(attributes: WooAttribute[], definitions: WooVaria
       name: attribute.name,
       terms: attribute.terms,
     })),
-    definitions,
+    definitions: new Map(definitions.map(definition => [definition.id, definition])),
   }
 }
 
 type VariationValues = ReadonlyMap<string, string | null>
 
 export function variationValues({ axes, definitions }: VariationGroup, id: number): VariationValues {
-  const attrs = definitions.find(definition => definition.id === id)?.attributes ?? []
+  const attrs = definitions.get(id)?.attributes ?? []
   const values = new Map<string, string | null>()
 
   for (const axis of axes) {

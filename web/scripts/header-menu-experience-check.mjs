@@ -8,8 +8,10 @@ try {
   await page.goto(process.env.URL??'http://127.0.0.1:5180/',{waitUntil:'domcontentloaded'})
   const video=page.locator('video.hero__video')
   await video.waitFor()
-  assert.equal(await video.getAttribute('src'),null,'Movimiento reducido no descarga el MP4')
-  assert.equal(await video.getAttribute('preload'),'none')
+  assert.ok(await video.getAttribute('src'))
+  assert.equal(await video.getAttribute('poster'), null)
+  assert.ok(await video.evaluate(el => el.paused))
+  assert.equal(await video.getAttribute('preload'),'auto')
   assert.ok(await video.evaluate(el=>el.muted&&el.defaultMuted&&el.volume===0&&el.loop&&el.playsInline))
   if(width>900) {
    const trigger=page.getByRole('button',{name:'Tienda',exact:true})

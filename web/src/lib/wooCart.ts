@@ -18,6 +18,7 @@ export interface WooCartItem {
   id: number
   name: string
   quantity: number
+  quantity_limits?: { minimum: number; maximum: number; multiple_of: number; editable: boolean }
   variation: WooCartAttribute[]
   images: { src: string; alt?: string }[]
   prices: Currency & { price: string }

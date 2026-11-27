@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'motion/react'
 import videoSource from '../../assets/videos/modern-template.mp4'
-import { images } from '../content/images'
 
 export function HeroVideo() {
   const video = useRef<HTMLVideoElement>(null)
@@ -14,7 +13,8 @@ export function HeroVideo() {
     element.defaultMuted = true
     element.volume = 0
     const silence = () => { if (!element.muted) element.muted = true; if (element.volume !== 0) element.volume = 0 }
-    let visible = true
+    // El archivo se solicita al montar la portada. La visibilidad solo controla la reproducción.
+    let visible = false
     const sync = () => {
       silence()
       if (!visible || document.hidden || paused || reduced) element.pause()
@@ -29,7 +29,7 @@ export function HeroVideo() {
     return () => { observer.disconnect(); element.pause(); element.removeEventListener('volumechange', silence); element.removeEventListener('loadeddata', sync); document.removeEventListener('visibilitychange', sync) }
   }, [paused, reduced])
   return <>
-    <div className="hero__visual" aria-hidden="true"><video ref={video} className="hero__media hero__video" src={reduced ? undefined : videoSource} poster={images.escanor} autoPlay={!reduced} muted loop playsInline preload={reduced ? 'none' : 'metadata'} aria-hidden="true" tabIndex={-1} disablePictureInPicture disableRemotePlayback /></div>
+    <div className="hero__visual" aria-hidden="true"><video ref={video} className="hero__media hero__video" src={videoSource} autoPlay={!paused && !reduced} muted loop playsInline preload="auto" aria-hidden="true" tabIndex={-1} disablePictureInPicture disableRemotePlayback /></div>
     {!reduced && <button type="button" className="hero__video-control" aria-label={paused ? 'Reproducir video de portada' : 'Pausar video de portada'} aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? 'Reproducir video' : 'Pausar video'}</button>}
   </>
 }

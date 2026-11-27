@@ -1,15 +1,17 @@
+import { WooLineControls } from '../components/WooLineControls'
 import { Button } from '../components/Button'
-import { products } from '../content/demo'
+import { localCartSummary } from '../lib/localCartSummary'
 import { useCart } from '../lib/CartContext'
 import { formatPEN } from '../lib/format'
 import { formatWooCartMoney } from '../lib/wooCart'
 import '../styles/checkout.css'
 
-function CheckoutItem({ name, image, detail, quantity, amount }: {
+function CheckoutItem({ name, image, detail, quantity, amount, controls }: {
   name: string
   image?: string
   detail: string
   quantity: number
+  controls?: React.ReactNode
   amount: string
 }) {
   return (
@@ -19,6 +21,7 @@ function CheckoutItem({ name, image, detail, quantity, amount }: {
         <strong>{name}</strong>
         {detail && <p>{detail}</p>}
         <p>{quantity} {quantity === 1 ? 'unidad' : 'unidades'}</p>
+        {controls}
       </div>
       <strong>{amount}</strong>
     </li>
@@ -26,16 +29,11 @@ function CheckoutItem({ name, image, detail, quantity, amount }: {
 }
 
 export function Checkout() {
-  const { lines, wooCart, wooCheckoutUrl, wooCartStatus, refreshWooCart, setOpen } = useCart()
-  const localItems = lines.flatMap(line => {
-    const product = products.find(item => item.id === line.id)
-    return product ? [{ ...line, product }] : []
-  })
+  const { lines, wooCart, wooCheckoutUrl, wooNativeCartUrl, wooCartFallbackUrl, wooPending, wooCartStatus, refreshWooCart, setOpen } = useCart()
+  const { items: localItems, subtotal: localSubtotal } = localCartSummary(lines)
   const wooItems = wooCart?.items ?? []
-  const localSubtotal = localItems.reduce((cents, { product, quantity }) =>
-    cents + Math.round(product.price * 100) * quantity, 0) / 100
   const hasItems = localItems.length > 0 || wooItems.length > 0
-  const canContinue = wooCheckoutUrl && wooItems.length > 0 && wooCartStatus === 'ready'
+  const canContinue = wooCheckoutUrl && wooItems.length > 0 && wooCartStatus === 'ready' && !wooPending
 
   return (
     <section className="container checkout" aria-labelledby="checkout-title">
@@ -81,6 +79,7 @@ export function Checkout() {
             <p role="alert">No pudimos consultar tu carrito de WooCommerce.</p>
             <Button variant="ghost" onClick={refreshWooCart}>Volver a intentar</Button>
           </div>}
+          {wooNativeCartUrl && <a className="link" href={wooNativeCartUrl}>Abrir carrito de WooCommerce</a>}
           {hasItems ? (
             <>
               <ul className="checkout-items">
@@ -91,6 +90,7 @@ export function Checkout() {
                 {wooItems.map(item => (
                   <CheckoutItem key={item.key} name={item.name} image={item.images[0]?.src}
                     detail={item.variation.map(pair => pair.value).join(', ')}
+                    controls={wooCheckoutUrl && <WooLineControls item={item} />}
                     quantity={item.quantity} amount={formatWooCartMoney(item.totals.line_total, item.totals)} />
                 ))}
               </ul>
@@ -106,7 +106,7 @@ export function Checkout() {
                 <div><dt>Entrega</dt><dd>Por confirmar</dd></div>
                 <div className="checkout-total"><dt>Total</dt><dd>Por confirmar</dd></div>
               </dl>
-              {canContinue && <Button block href={wooCheckoutUrl}>Continuar al pago</Button>}
+              {canContinue && <Button block href={wooNativeCartUrl ? wooCheckoutUrl : wooCartFallbackUrl}>Continuar al pago</Button>}
               {wooCheckoutUrl ? (
                 localItems.length > 0 && <p className="checkout-preview">La selección local se consulta por WhatsApp desde el carrito.</p>
               ) : (

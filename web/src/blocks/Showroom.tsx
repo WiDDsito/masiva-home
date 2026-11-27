@@ -5,7 +5,6 @@ import { SplitText } from '../components/SplitText'
 import { products } from '../content/demo'
 import { rooms, showroomCatalogHref, showroomPieces } from '../content/showroom'
 import type { RoomId } from '../content/showroom'
-import { useInView } from '../lib/useInView'
 
 const Showroom3D = lazy(() => import('../three/Showroom3D'))
 const roomIds = Object.keys(rooms) as RoomId[]
@@ -28,7 +27,7 @@ export function Showroom() {
   const [zoom, setZoom] = useState(1)
   const [reset, setReset] = useState(0)
   const stage = useRef<HTMLDivElement>(null)
-  const { ref, visible } = useInView<HTMLElement>('300px')
+  const [enteredStage, setEnteredStage] = useState(false)
   const showFallback = useCallback(() => {
     setUnavailable(true)
     setRotate(false)
@@ -52,7 +51,10 @@ export function Showroom() {
   const selectedSpecs = selected?.preview?.specs ?? (selectedProduct && `${selectedProduct.dimensions} · ${selectedProduct.color}`)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => setInViewport(entry.isIntersecting))
+    const observer = new IntersectionObserver(([entry]) => {
+      setInViewport(entry.isIntersecting)
+      if (entry.isIntersecting) setEnteredStage(true)
+    })
     if (stage.current) observer.observe(stage.current)
     const onVisibility = () => setPageVisible(!document.hidden)
     document.addEventListener('visibilitychange', onVisibility)
@@ -60,7 +62,7 @@ export function Showroom() {
   }, [])
 
   return (
-    <section ref={ref} className="showroom on-dark" id="showroom" aria-labelledby="showroom-title" onKeyDown={event => {
+    <section className="showroom on-dark" id="showroom" aria-labelledby="showroom-title" onKeyDown={event => {
       if (event.key !== 'Escape' || !selected) return
       closeProduct()
     }}>
@@ -110,7 +112,7 @@ export function Showroom() {
                 </button>
               ))}
             </div>
-          </div> : visible && <ShowroomBoundary onUnavailable={showFallback}><Suspense fallback={<span className="showroom__loading" role="status">Preparando el showroom…</span>}>
+          </div> : enteredStage && <ShowroomBoundary onUnavailable={showFallback}><Suspense fallback={<span className="showroom__loading" role="status">Preparando el showroom…</span>}>
             <Showroom3D room={room} active={active} onSelect={selectPiece} pan={pan} running={inViewport && pageVisible} rotate={rotate} reset={reset} zoom={zoom} onUnavailable={showFallback} />
           </Suspense></ShowroomBoundary>}
           {!unavailable && <>

@@ -63,6 +63,7 @@ function CatalogBagButton() {
 
 export function Catalog({ focusSearch = false, initialCategory = 'all' }: { focusSearch?: boolean; initialCategory?: string }) {
   const [filters, setFilters] = useState(() => readCatalogFilters(initialCategory))
+  const [draftSearch, setDraftSearch] = useState(filters.search)
   const [categoryIds, setCategoryIds] = useState<Map<string, number> | 'error' | null>(null)
   const [categoryAttempt, setCategoryAttempt] = useState(0)
   const [productAttempt, setProductAttempt] = useState(0)
@@ -76,10 +77,20 @@ export function Catalog({ focusSearch = false, initialCategory = 'all' }: { focu
   const requestKey = query === null ? null : `${query}:${productAttempt}`
   const current = request?.key === requestKey ? request : null
   const result = current?.status === 'ready' ? current.result : null
+  const updating = query !== null && !current && request?.status === 'ready'
+  const displayed = result ?? (updating && request?.status === 'ready' ? request.result : null)
   const categoryName = catalogFilterCategories.find(item => item.id === category)?.name
   const categoryError = category !== 'all' && categoryIds === 'error'
   const unmatched = category !== 'all' && categoryIds instanceof Map && categoryId === undefined
-  const isLoading = !categoryError && !unmatched && current === null
+  const isLoading = !categoryError && !unmatched && current === null && !updating
+
+  useEffect(() => {
+    if (draftSearch === search) return
+    const timer = window.setTimeout(() => {
+      setFilters(previous => ({ ...previous, search: draftSearch, page: 1 }))
+    }, 300)
+    return () => window.clearTimeout(timer)
+  }, [draftSearch, search])
 
   useEffect(() => { if (focusSearch) searchInput.current?.focus() }, [focusSearch])
   useEffect(() => {
@@ -89,7 +100,11 @@ export function Catalog({ focusSearch = false, initialCategory = 'all' }: { focu
   }, [catalogQuery])
   useEffect(() => {
     const restore = () => {
-      if (window.location.hash.startsWith('#catalogo')) setFilters(readCatalogFilters())
+      if (window.location.hash.startsWith('#catalogo')) {
+        const restored = readCatalogFilters()
+        setDraftSearch(restored.search)
+        setFilters(restored)
+      }
     }
     window.addEventListener('hashchange', restore)
     return () => window.removeEventListener('hashchange', restore)
@@ -116,8 +131,11 @@ export function Catalog({ focusSearch = false, initialCategory = 'all' }: { focu
     return () => controller.abort()
   }, [query, requestKey])
 
-  const clear = () => setFilters(current => ({ ...current, category: 'all', search: '', page: 1 }))
-  const selectCategory = (id: string) => setFilters(current => ({ ...current, category: id, search: '', page: 1 }))
+  const clear = () => selectCategory('all')
+  const selectCategory = (id: string) => {
+    setDraftSearch('')
+    setFilters(current => ({ ...current, category: id, search: '', page: 1 }))
+  }
   const retry = () => {
     if (categoryError) {
       setCategoryIds(null)
@@ -133,10 +151,7 @@ export function Catalog({ focusSearch = false, initialCategory = 'all' }: { focu
       <div className="catalog-page__breadcrumb"><a href="#inicio">Inicio</a><span aria-hidden="true">/</span><span>Catálogo</span></div>
       <div className="catalog-page__heading">
         <div><h1 id="catalogo-title">Catálogo de muebles</h1><p>Encuentra la pieza que buscas.</p></div>
-        <label className="catalog-page__search"><span className="visually-hidden">Buscar en el catálogo</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input ref={searchInput} id="catalog-search" type="search" name="q" autoComplete="off" spellCheck={false} placeholder="Busca un mueble o SKU…" value={search} onChange={event => {
-          const value = event.target.value
-          setFilters(current => ({ ...current, search: value, page: 1 }))
-        }} /></label>
+        <label className="catalog-page__search"><span className="visually-hidden">Buscar en el catálogo</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input ref={searchInput} id="catalog-search" type="search" name="q" autoComplete="off" spellCheck={false} placeholder="Busca un mueble o SKU…" value={draftSearch} onChange={event => setDraftSearch(event.target.value)} /></label>
       </div>
       <CatalogMenu category={category} onSelect={selectCategory} />
       <div className="catalog-page__toolbar">
@@ -166,19 +181,20 @@ export function Catalog({ focusSearch = false, initialCategory = 'all' }: { focu
         </div>
       </div>
       {(category !== 'all' || search) && <div className="catalog-page__active"><span>{search ? `Búsqueda: “${search}”` : categoryName}</span><button type="button" onClick={clear}>Limpiar filtros <span aria-hidden="true">×</span></button></div>}
+      {updating && <p role="status">Actualizando resultados…</p>}
       {isLoading ? <div className="catalog-page__empty" role="status">Cargando catálogo de WooCommerce…</div>
         : categoryError || current?.status === 'error' ? <div className="catalog-page__empty">
           <p role="alert">{categoryError ? 'No pudimos cargar las categorías de WooCommerce.' : 'No pudimos cargar los productos de WooCommerce.'}</p>
           <Button variant="ghost" onClick={retry}>Volver a intentar</Button>
         </div>
         : unmatched ? <div className="catalog-page__empty"><p role="status">Este filtro no tiene una categoría equivalente en WooCommerce.</p></div>
-        : result?.cards.length ? <div className="catalog-grid">{result.cards.map(({ id, ...card }) => <CatalogCardLayout
+        : displayed?.cards.length ? <div className="catalog-grid" aria-busy={updating}>{displayed.cards.map(({ id, ...card }) => <CatalogCardLayout
           key={id}
           {...card}
           heading="h3"
           href={`#producto/${id}${catalogQuery}`}
         />)}</div>
-        : <div className="catalog-page__empty">
+        : updating ? null : <div className="catalog-page__empty">
           <h3>{search ? 'No encontramos ese mueble.' : 'No encontramos productos.'}</h3>
           {page > 1 ? <Button variant="ghost" onClick={() => goToPage(1)}>Volver a la primera página</Button>
             : (category !== 'all' || search) && <Button variant="ghost" onClick={clear}>Ver todos los muebles</Button>}

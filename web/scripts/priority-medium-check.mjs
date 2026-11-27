@@ -65,7 +65,7 @@ try {
     const page = await browser.newPage({ viewport: { width: 390, height: 900 }, reducedMotion: 'reduce' })
     try {
       await page.goto(url)
-      assert.equal(await page.locator('video').getAttribute('src'), null)
+      assert.ok(await page.locator('video').evaluate(el => el.paused && !el.autoplay))
       const button = page.locator('.hero__actions .btn--primary')
       await button.hover()
       assert.equal(await button.evaluate(el => getComputedStyle(el).transform), 'none')

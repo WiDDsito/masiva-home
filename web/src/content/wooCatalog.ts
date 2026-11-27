@@ -47,12 +47,26 @@ function normalizeCategory(name: string) {
   return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
 }
 
+let cachedCategoryFilters: Map<string, number> | undefined
+
 export async function loadWooCategoryFilters(signal: AbortSignal) {
-  const response = await fetch(`${productsEndpoint}/categories?hide_empty=false`, {
-    signal,
-    credentials: 'omit',
-  })
-  const categories = await readCollection<WooCategory>(response)
+  if (cachedCategoryFilters) return cachedCategoryFilters
+  const byId = new Map<number, WooCategory>()
+  const pageSize = 100
+  for (let page = 1; ; page++) {
+    const query = new URLSearchParams({
+      hide_empty: 'false', orderby: 'slug', per_page: String(pageSize), page: String(page),
+    })
+    const response = await fetch(`${productsEndpoint}/categories?${query}`, { signal, credentials: 'omit' })
+    const rows = await readCollection<WooCategory>(response)
+    const before = byId.size
+    for (const row of rows) byId.set(row.id, row)
+    if (rows.length && byId.size === before) throw new Error('WooCommerce repitió una página de categorías.')
+    if (response.headers.has('X-WP-TotalPages')) {
+      if (page >= paginationHeader(response, 'X-WP-TotalPages')) break
+    } else if (rows.length < pageSize) break
+  }
+  const categories = [...byId.values()]
   const filters = new Map<string, number>()
 
   for (const filter of catalogFilterCategories) {
@@ -61,6 +75,7 @@ export async function loadWooCategoryFilters(signal: AbortSignal) {
     if (term) filters.set(filter.id, term.id)
   }
 
+  cachedCategoryFilters = filters
   return filters
 }
 
@@ -193,9 +208,10 @@ export async function loadWooVariations(parent: number, group: VariationGroup, s
 
   let totalPages = 1
   let total = 0
-  for (let page = 1; page <= totalPages; page += 1) {
-    query.set('page', String(page))
-    const response = await fetch(`${productsEndpoint}?${query}`, { signal, credentials: 'omit' })
+  async function loadPage(page: number) {
+    const pageQuery = new URLSearchParams(query)
+    pageQuery.set('page', String(page))
+    const response = await fetch(`${productsEndpoint}?${pageQuery}`, { signal, credentials: 'omit' })
     const products = await readCollection<WooProduct>(response)
     if (page === 1) {
       totalPages = paginationHeader(response, 'X-WP-TotalPages')
@@ -207,6 +223,12 @@ export async function loadWooVariations(parent: number, group: VariationGroup, s
       }
       variants.set(product.id, toWooVariation(product, group))
     }
+  }
+  await loadPage(1)
+  for (let page = 2; page <= totalPages; page += 2) {
+    const batch = [loadPage(page)]
+    if (page < totalPages) batch.push(loadPage(page + 1))
+    await Promise.all(batch)
   }
   if (variants.size !== total) throw new Error('La lista de variantes de WooCommerce está incompleta')
   return variants

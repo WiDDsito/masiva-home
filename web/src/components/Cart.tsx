@@ -1,13 +1,15 @@
+import { WooLineControls } from './WooLineControls'
 import { Button } from './Button'
 import { CartNotice } from './CartNotice'
 import { useEffect, useRef } from 'react'
-import { products, contact } from '../content/demo'
+import { contact } from '../content/demo'
 import { useCart } from '../lib/CartContext'
+import { localCartSummary } from '../lib/localCartSummary'
 import { formatPEN } from '../lib/format'
 import { formatWooCartMoney } from '../lib/wooCart'
 
 export function Cart() {
-  const { lines, wooCart, wooCheckoutUrl, wooCartStatus, refreshWooCart, setQuantity, open, setOpen } = useCart()
+  const { lines, wooCart, wooCheckoutUrl, wooNativeCartUrl, wooCartFallbackUrl, wooNotice, wooPending, wooCartStatus, refreshWooCart, setQuantity, open, setOpen } = useCart()
   const dialog = useRef<HTMLDialogElement>(null)
   const closing = useRef(false)
   useEffect(() => {
@@ -43,15 +45,17 @@ export function Cart() {
     }
     if (element.dataset.closing === 'true') setOpen(false)
   }
-  const items = lines.flatMap(line => { const product = products.find(p => p.id === line.id); return product ? [{ ...line, product }] : [] })
+  const { items, subtotal: total } = localCartSummary(lines)
   const wooItems = wooCart?.items ?? []
-  const total = items.reduce((n, l) => n + Math.round(l.product.price * 100) * l.quantity, 0) / 100
   const message = `Hola, quisiera confirmar disponibilidad y entrega de:\n${items.map(l => `${l.quantity} × ${l.product.name} (${l.product.model}, ${l.product.color}) — ${formatPEN(l.product.price * l.quantity)}`).join('\n')}\nSubtotal de productos: ${formatPEN(total)}. Envío por confirmar.`
   const whatsapp = `${contact.whatsapp.split('?')[0]}?text=${encodeURIComponent(message)}`
   return <>
     <CartNotice />
     <dialog ref={dialog} id="shopping-bag" className="cart-dialog" aria-labelledby="cart-title" onCancel={event => { event.preventDefault(); void requestClose() }} onClose={() => setOpen(false)} data-lenis-prevent>
       <div className="cart-dialog__head"><h2 id="cart-title">Tu carrito</h2><button className="icon-btn" type="button" autoFocus aria-label="Cerrar carrito" onClick={() => void requestClose()}>×</button></div>
+      {!wooNativeCartUrl && wooCartFallbackUrl && wooItems.length > 0 && !wooPending && wooCartStatus === 'ready' && <a className="link" href={wooCartFallbackUrl}>Ir al pago en Masiva Home</a>}
+      {wooNotice && <p role="alert">{wooNotice}</p>}
+      {wooNativeCartUrl && <a className="link" href={wooNativeCartUrl}>Abrir carrito de WooCommerce</a>}
       {wooCartStatus === 'error' && <div className="cart-summary">
         <p role="alert">No pudimos consultar tu carrito de WooCommerce.</p>
         <Button variant="ghost" onClick={refreshWooCart}>Volver a intentar</Button>
@@ -69,11 +73,12 @@ export function Cart() {
             <h3>{item.name}</h3>
             {item.variation.map(pair => <p key={pair.attribute}>{pair.attribute}: {pair.value}</p>)}
             <p>Cantidad: {item.quantity} × {formatWooCartMoney(item.prices.price, item.prices)}</p>
+            {wooCheckoutUrl && <WooLineControls item={item} />}
             <p>{formatWooCartMoney(item.totals.line_total, item.totals)}</p>
           </div>
         </li>)}</ul>
         {(!wooCheckoutUrl || wooItems.length > 0) && <div className="cart-checkout-action">
-          <Button block onClick={() => {
+          <Button block disabled={wooPending} onClick={() => {
             setOpen(false)
             window.location.hash = '#finalizar-compra'
           }}>Finalizar compra</Button>
