@@ -1,10 +1,10 @@
 # Masiva Home
 
-Rediseño de la experiencia web y catálogo de Masiva Home, empresa peruana de muebles. Incluye inicio minimalista, catálogo por categorías, vista rápida con galerías/acabados, carrito local y showroom 3D.
+Tienda de muebles con catálogo React, showroom 3D e integración con la Store API de WooCommerce. El catálogo comercial, las variantes y el carrito usan datos de WooCommerce. La selección local para consultas por WhatsApp tiene sus propios artículos y subtotal.
 
-## Ejecutar la web local
+## Desarrollo local
 
-Requiere Node.js 20+ y npm. Las comprobaciones visuales requieren Google Chrome instalado.
+Desde la raíz del repositorio, con Node.js 20 o superior y npm, ejecuta estos comandos.
 
 ```sh
 cd web
@@ -12,25 +12,23 @@ npm ci
 npm run dev
 ```
 
-```sh
-npm run build
-npm run preview
-```
+Vite abre el servicio en el puerto 5173. En desarrollo, las consultas a productos se envían mediante proxy a Masiva Home y el simulador de Vite atiende las adiciones al carrito local de pruebas. Los scripts de navegador requieren Chrome. Los comandos disponibles están en [package.json](web/package.json).
 
-## Organización
+## Integración en WordPress
 
-- [`web/`](web/): código React + TypeScript + Vite, fotografías y videos locales, pruebas y documentación de implementación.
-- [`docs/Informe-Masiva-Home-2026-11-13.md`](docs/Informe-Masiva-Home-2026-11-13.md): informe para alinear diseño, WordPress/backend y lenguaje del equipo.
-- [`web/README.md`](web/README.md): funciones implementadas, fuentes de datos, comprobaciones y límites actuales.
-- [`docs/Revision-skills-2026-11-13.md`](docs/Revision-skills-2026-11-13.md): revisión de usabilidad, rendimiento, catálogo y bolsa con mediciones locales.
-- `docs/` y `plan/`: especificaciones y decisiones históricas. Sus supuestos deben contrastarse con las instrucciones vigentes y el informe de alineamiento.
+Desde `web/`, ejecuta `npm run build:wordpress` para generar los archivos en `dist/` con rutas de recursos relativas. La instalación de WordPress debe servir la aplicación en el mismo origen que su Store API bajo `/wp-json/wc/store/v1/`. La compilación genera los archivos para integrar en el sitio.
 
-## Estado de integración
+Antes de montar React, el tema o plugin puede exponer `window.MASIVA_FRONT` con `cartUrl`, `checkoutUrl` y `restNonce`. El frontend también reconoce el elemento `mh-frontend-bridge-css`. El carrito usa las cookies de la sesión y guarda en memoria el nonce que devuelve la Store API. La ruta acordada cuando el puente omite el carrito figura en el [plan de integración](plan/arquitectura-y-compra.md).
 
-Esta entrega es un prototipo funcional local. Todavía no está integrado en WordPress/WooCommerce ni crea pedidos o cobra pagos. El siguiente paso es adaptar el diseño al catálogo WordPress existente, conservar sus datos y conectar el carrito y checkout reales.
+## Documentación
 
-Los precios públicos de esta entrega provienen de **Carga General**. **Cotizaciones** se utiliza como información y no alimenta los precios públicos. Esta regla sustituye las referencias antiguas que indiquen lo contrario en `docs/` o `plan/`. Los productos sin precio confirmado permiten consulta desde el catálogo.
-
-El video actual de portada es `web/assets/videos/modern-template.mp4`, con audio silenciado. El archivo actual pesa 1,4 MB. Con movimiento reducido se muestra el póster y no se solicita el video.
-
-No se versionan dependencias instaladas, compilaciones, capturas de prueba, respaldos ni archivos de configuración privados.
+| Ubicación | Qué contiene |
+|---|---|
+| [Código web](web/src/) | Vistas en `blocks/`, componentes en `components/`, catálogo y variantes en `content/`, carrito e integración en `lib/`. |
+| [Actualizaciones](docs/actualizaciones.md) | Cambios nuevos ordenados por fecha. |
+| [Plan](plan/arquitectura-y-compra.md) | Decisiones de arquitectura, diseño y flujo de compra que deben conservarse al evolucionar la tienda. |
+| [Guía del frontend](web/GUIA-FRONTEND.md) | Punto de entrada para trabajar dentro de `web/`. |
+| [Prototipo web de noviembre de 2026](docs/web-prototipo.md) | Entorno local, fuentes de precios, componentes y requisitos comerciales del prototipo. |
+| [Interacciones y showroom del 12 de noviembre de 2026](docs/web-interacciones-2026-11-12.md) | Interacciones de producto, animaciones, showroom y familias de muebles. |
+| [Catálogo y navegación del 13 de noviembre de 2026](docs/web-navegacion-2026-11-13.md) | Menús, búsqueda, transiciones, bolsa local y revisión de usabilidad. |
+| [Mejoras del 16 de noviembre de 2026](docs/web-mejoras-2026-11-16.md) | Mejoras de accesibilidad, movimiento, servicios y nuevos aparadores. |
